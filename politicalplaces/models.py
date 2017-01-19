@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from django.template.defaultfilters import slugify
 from .backends import Client
@@ -29,10 +31,7 @@ class MapItem(models.Model):
     response_json = models.TextField()
     geocode = models.CharField(max_length=255)
     slug = models.SlugField()
-    #use_viewport = models.BooleanField(default=True)
     url = models.CharField(max_length=255, blank=True)
-    #custom_zoom = models.PositiveSmallIntegerField(
-    #    blank=True, null=True, choices=[(x, x) for x in range(1, 22)])
 
     @classmethod
     def get_or_create_from_place_id(cls, place_id, url=''):
@@ -103,12 +102,19 @@ class MapItem(models.Model):
             })
         return mapitem
 
+    def __str__(self):
+        return "{}({})".format(self.long_name, self.geo_type)
+
+    def __unicode__(self):
+        return self.__str__()
+
 
 class PoliticalPlace(models.Model):
 
     """
     Geo Types according to google maps standard:
     https://developers.google.com/maps/documentation/geocoding/intro#Types
+    The model manages all the 'political' types
     """
     continent = models.CharField(max_length=255, blank=True)
     country = models.CharField(max_length=255, blank=True)
@@ -130,8 +136,8 @@ class PoliticalPlace(models.Model):
     #    'geocode_field': 'geocode', 'type_field': 'geo_type',
     #    'allowed_types': ALLOWED_TYPES},
     #    select2_options={'width': '300px'},
-    #    help_text=(u"Type the address you're looking for and click "
-    #               u"on the red marker to select it."))
+    #    help_text=("Type the address you're looking for and click "
+    #               "on the red marker to select it."))
     place_id = models.CharField(unique=True, max_length=255)
     geocode = models.CharField(max_length=255, blank=True)
     geo_type = models.CharField(max_length=100, blank=True)
@@ -178,6 +184,18 @@ class PoliticalPlace(models.Model):
         related_name='politicalplace_sublocality_set',
         null=True, blank=True)
 
+    @property
+    def lat(self):
+        if self.geocode:
+            return self.geocode.split(",")[0]
+        return None
+
+    @property
+    def lng(self):
+        if self.geocode:
+            return self.geocode.split(",")[1]
+        return None
+
     @staticmethod
     def _get_main_type(types):
         for t in POLITICAL_TYPES:
@@ -208,6 +226,9 @@ class PoliticalPlace(models.Model):
                 pass  # type is not political
 
     def process_address(self):
+        """
+        Use this method to process a Place with only the address provided
+        """
         client = Client()
         geocode_result = client.geocode(self.address)
         if geocode_result == []:
@@ -224,16 +245,28 @@ class PoliticalPlace(models.Model):
         self.geo_type = self._get_main_type(geocode_result['types'])
         self.types = geocode_result['types']
         self.response_json = json.dumps(geocode_result)
-        self.continent = country_to_continent(self.country)
         for component in address_components[::-1]:
             for t in POLITICAL_TYPES:
                 if t in component['types']:
                     setattr(self, t, component['long_name'])
-                else:
+                elif not getattr(self, t):
                     setattr(self, t, "")
-
+        self.continent = country_to_continent(self.country)
         self._create_map_items(client, location['lat'], location['lng'])
         self.save()
 
-    #def save(self, *args, **kwargs):
-    #    super(PoliticalPlace, self).save(*args, **kwargs)
+    def link_map_items(self):
+        """
+        Use this method when your objects has all the static geograpghic
+        informations filled by frontend
+        """
+        client = Client()
+        self.continent = country_to_continent(self.country)
+        self._create_map_items(client, self.lat, self.lng)
+        self.save()
+
+    def __str__(self):
+        return self.address
+
+    def __unicode__(self):
+        return self.__str__()

@@ -21,45 +21,6 @@ POLITICAL_MAP_BACKEND = 'googlemaps'
 # GMAPS
 GOOGLE_API_KEY = "AIzaSyCQbVeTVyl1eUDzJbgpoSTaCb_9wHq1kik"
 
-# GEO TYPE according to googlemaps standard
-# https://developers.google.com/maps/documentation/geocoding/intro#Types
-#POLITICAL_MAP_ALLOWED_TYPES = (
-#    'street_address',
-#    'route',
-#    'intersection',
-#    'political',
-#    'continent',
-#    'country',
-#    'administrative_area_level_1',
-#    'administrative_area_level_2',
-#    'administrative_area_level_3',
-#    'administrative_area_level_4',
-#    'administrative_area_level_5',
-#    'colloquial_area',
-#    'locality',
-#    'ward',
-#    'sublocality',
-#    'neighborhood',
-#    'premise',
-#    'subpremise',
-#    'postal_code',
-#    'natural_feature',
-#    'airport',
-#    'park',
-#    'point_of_interest',
-#)
-
-POLITICAL_MAP_HIERARCHICAL_TYPES = (
-    'country',
-    'administrative_area_level_1',
-    'administrative_area_level_2',
-    'administrative_area_level_3',
-    'administrative_area_level_4',
-    'administrative_area_level_5',
-    'locality',
-    'ward',
-    'sublocality',
-)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

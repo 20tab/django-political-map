@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.test import TestCase
 from .models import PoliticalPlace, MapItem
 from .utils import country_to_continent
@@ -23,16 +25,21 @@ class UtilsTest(TestCase):
         self.assertEqual(
             "South America", country_to_continent("Colombia"))
 
+    def test_country_to_continent_none(self):
+        self.assertFalse(country_to_continent("Klingon"))
+
 
 class PoliticalPlaceModelTest(TestCase):
 
     def setUp(self):
         self.test_place = PoliticalPlace(
             address="via Luigi Gastinelli 118, Rome, Italy")
-        #self.test_place = PoliticalPlace()
-        #self.test_place.place_id = "ChIJMf7niO18LxMRiiU06M8Kpf4"
-        #self.test_place_address
-        #self.test_place.save()
+        self.test_place_wrong_addr = PoliticalPlace(
+            address="qwertyuiop")
+
+    def test_latlng_property_empty_geocode(self):
+        self.assertFalse(self.test_place.lat)
+        self.assertFalse(self.test_place.lng)
 
     def test_political_place_create_map_items(self):
         self.test_place.continent = 'Europe'
@@ -42,8 +49,8 @@ class PoliticalPlaceModelTest(TestCase):
         lat = '41.6552418'
         lng = '12.989615'
         self.test_place._create_map_items(client, lat, lng)
-        #self.assertEqual(
-        #    "Europe", self.test_place.continent_item.long_name)
+        self.assertEqual(
+            "Europe", self.test_place.continent_item.long_name)
         self.assertEqual(
             "Italy", self.test_place.country_item.long_name)
         self.assertEqual(
@@ -58,7 +65,16 @@ class PoliticalPlaceModelTest(TestCase):
         self.assertFalse(
             self.test_place.sublocality_item)
 
-    def test_political_place_admin_fields_creation(self):
+    def test_political_place_create_map_items_no_continent(self):
+        self.test_place.country = 'Italy'
+        client = Client()
+        lat = '41.6552418'
+        lng = '12.989615'
+        self.test_place._create_map_items(client, lat, lng)
+        self.assertEqual(
+            "Italy", self.test_place.country_item.long_name)
+
+    def test_political_place_process_address_admin_fields_creation(self):
         self.test_place.process_address()
         self.assertEqual(
             self.test_place.administrative_area_level_1,
@@ -67,7 +83,7 @@ class PoliticalPlaceModelTest(TestCase):
             self.test_place.country,
             "Italy")
 
-    def test_political_place_map_items_creation(self):
+    def test_political_place_process_address_map_items_creation(self):
         self.test_place.process_address()
         self.assertEqual(
             self.test_place.administrative_area_level_1_item.long_name,
@@ -75,6 +91,27 @@ class PoliticalPlaceModelTest(TestCase):
         self.assertEqual(
             self.test_place.country_item.short_name,
             "IT")
+
+    def test_political_place_process_address_wrong(self):
+        with self.assertRaises(NoResultsException):
+            self.test_place_wrong_addr.process_address()
+
+    def test_political_place_link_map_items(self):
+        self.test_place.geocode = "41.6552418,12.989615"
+        self.test_place.place_id = ""
+        self.test_place.address = "Lazio, Italy"
+        self.test_place.country = "Italy"
+        self.test_place.administrative_area_level_1 = "Lazio"
+        self.test_place.link_map_items()
+        self.assertEqual(
+            self.test_place.administrative_area_level_1_item.long_name,
+            "Lazio")
+        self.assertEqual(
+            self.test_place.country_item.short_name,
+            "IT")
+        self.assertEqual(
+            self.test_place.continent_item.long_name,
+            "Europe")
 
 
 class MapItemModelTest(TestCase):
