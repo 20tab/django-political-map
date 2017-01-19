@@ -1,0 +1,13 @@
+[run]
+branch = True
+source = .
+include =
+
+omit =  manage.py
+        politicalplaces/migrations/*
+        politicalplaces/apps.py
+        djangopoliticalmap/settings.py
+        djangopoliticalmap/wsgi.py
+        
+[html]
+directory = coverage
