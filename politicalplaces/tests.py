@@ -1,11 +1,34 @@
 from __future__ import unicode_literals
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from .models import PoliticalPlace, MapItem
 from .utils import country_to_continent
 from .backends import Client
 from .exceptions import GeoTypeException, NoResultsException
+from .widgets import PlaceWidget
 from googlemaps.exceptions import HTTPError
+
+
+class PlaceWidgetTest(TestCase):
+
+    def setUp(self):
+        self.placewidget = PlaceWidget()
+
+    def test_place_widget_media(self):
+        self.assertEqual(
+            str(self.placewidget.media),
+            ('<script type="text/javascript" '
+             'src="/static/politicalplace/js/politicalplace.js">'
+             '</script>'),)
+
+    def test_place_widget_render(self):
+        self.assertEqual(
+            str(self.placewidget.render('myfield', 'myvalue')),
+            ('<input name="myfield" type="text" value="myvalue" />\n'
+             '<div class="place-widget" style="margin-top: 4px">\n    '
+             '<label></label>\n    <div id="map_myfield" '
+             'style="width: 500px; height: 250px"></div>\n</div>\n')
+        )
 
 
 class BackendTest(TestCase):
@@ -13,6 +36,14 @@ class BackendTest(TestCase):
     def test_init_client(self):
         from .backends import googlemaps
         self.assertTrue(googlemaps.Client)
+
+    @override_settings(LANGUAGE_CODE='en-us')
+    def test_geocode(self):
+        client = Client()
+        res = client.geocode("Roma, IT")
+        self.assertEqual(
+            "Rome, Italy",
+            res[0]['formatted_address'])
 
 
 class UtilsTest(TestCase):
@@ -36,6 +67,13 @@ class PoliticalPlaceModelTest(TestCase):
             address="via Luigi Gastinelli 118, Rome, Italy")
         self.test_place_wrong_addr = PoliticalPlace(
             address="qwertyuiop")
+
+    def test_unicode_str(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            self.test_place.address)
+        self.assertEqual(
+            str(test_place),
+            "Via Luigi Gastinelli, 118, 00132 Roma RM, Italy")
 
     def test_latlng_property_empty_geocode(self):
         self.assertFalse(self.test_place.lat)
@@ -74,27 +112,30 @@ class PoliticalPlaceModelTest(TestCase):
         self.assertEqual(
             "Italy", self.test_place.country_item.long_name)
 
-    def test_political_place_process_address_admin_fields_creation(self):
-        self.test_place.process_address()
+    def test_political_place_get_or_create_from_address_fields_creation(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            self.test_place.address)
         self.assertEqual(
-            self.test_place.administrative_area_level_1,
+            test_place.administrative_area_level_1,
             "Lazio")
         self.assertEqual(
-            self.test_place.country,
+            test_place.country,
             "Italy")
 
-    def test_political_place_process_address_map_items_creation(self):
-        self.test_place.process_address()
+    def test_political_place_get_or_create_from_address_items_creation(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            self.test_place.address)
         self.assertEqual(
-            self.test_place.administrative_area_level_1_item.long_name,
+            test_place.administrative_area_level_1_item.long_name,
             "Lazio")
         self.assertEqual(
-            self.test_place.country_item.short_name,
+            test_place.country_item.short_name,
             "IT")
 
     def test_political_place_process_address_wrong(self):
         with self.assertRaises(NoResultsException):
-            self.test_place_wrong_addr.process_address()
+            PoliticalPlace.get_or_create_from_address(
+                self.test_place_wrong_addr.address)
 
     def test_political_place_link_map_items(self):
         self.test_place.geocode = "41.6552418,12.989615"
@@ -117,7 +158,13 @@ class PoliticalPlaceModelTest(TestCase):
 class MapItemModelTest(TestCase):
 
     def setUp(self):
-        pass
+        self.test_item = MapItem.get_or_create_from_address(
+            "Lazio, Italy", 'administrative_area_level_1')
+
+    def test_unicode_str(self):
+        self.assertEqual(
+            str(self.test_item),
+            "Lazio(administrative_area_level_1)")
 
     def test_get_or_create_from_place_id_create(self):
         place_id = "ChIJNWU6NebuJBMRKYWj8WSQSm8"
@@ -164,14 +211,14 @@ class MapItemModelTest(TestCase):
                 address, 'country')
 
     def test_get_or_create_from_address_get(self):
-        self.assertEqual(0, MapItem.objects.count())
-        address = "Lazio, Italy"
+        self.assertEqual(1, MapItem.objects.count())
+        address = "Calabria, Italy"
         MapItem.get_or_create_from_address(
             address, 'administrative_area_level_1')
-        self.assertEqual(1, MapItem.objects.count())
+        self.assertEqual(2, MapItem.objects.count())
         MapItem.get_or_create_from_address(
             address, 'administrative_area_level_1')
-        self.assertEqual(1, MapItem.objects.count())
+        self.assertEqual(2, MapItem.objects.count())
 
     def test_get_or_create_from_address_africa(self):
         address = "Kayuma"

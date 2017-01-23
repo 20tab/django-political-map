@@ -23,7 +23,7 @@ POLITICAL_TYPES = [
 
 
 class MapItem(models.Model):
-    place_id = models.CharField(max_length=255)
+    place_id = models.CharField(unique=True, max_length=255)
     long_name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=255, blank=True)
     geo_type = models.CharField(max_length=100)
@@ -132,12 +132,6 @@ class PoliticalPlace(models.Model):
     ward = models.CharField(max_length=255, blank=True)
     sublocality = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255)
-    #address = GmapsField(plugin_options={
-    #    'geocode_field': 'geocode', 'type_field': 'geo_type',
-    #    'allowed_types': ALLOWED_TYPES},
-    #    select2_options={'width': '300px'},
-    #    help_text=("Type the address you're looking for and click "
-    #               "on the red marker to select it."))
     place_id = models.CharField(unique=True, max_length=255)
     geocode = models.CharField(max_length=255, blank=True)
     geo_type = models.CharField(max_length=100, blank=True)
@@ -225,7 +219,7 @@ class PoliticalPlace(models.Model):
             except AttributeError:
                 pass  # type is not political
 
-    def process_address(self):
+    def _process_address(self):
         """
         Use this method to process a Place with only the address provided
         """
@@ -241,6 +235,12 @@ class PoliticalPlace(models.Model):
 
         self.address = geocode_result['formatted_address']
         self.place_id = geocode_result['place_id']
+        try:
+            existing_item = self.__class__.objects.get(place_id=self.place_id)
+        except self.__class__.DoesNotExist:
+            pass
+        else:
+            return existing_item
         self.geocode = "{},{}".format(location['lat'], location['lng'])
         self.geo_type = self._get_main_type(geocode_result['types'])
         self.types = geocode_result['types']
@@ -253,7 +253,18 @@ class PoliticalPlace(models.Model):
                     setattr(self, t, "")
         self.continent = country_to_continent(self.country)
         self._create_map_items(client, location['lat'], location['lng'])
-        self.save()
+        return self
+
+    @classmethod
+    def get_or_create_from_address(cls, address):
+        """
+        Use this method to get or create a PoliticalPlace when only
+        the address is given (for example using it in the backend only)
+        """
+        place = cls(address=address)
+        place = place._process_address()
+        place.save()
+        return place
 
     def link_map_items(self):
         """
