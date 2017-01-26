@@ -57,6 +57,6 @@ class MyLocationTest(TestCase):
     def test_mylocation_form_media(self):
         self.assertHTMLEqual(
             ('<script type="text/javascript" src='
-             '"/static/politicalplace/js/politicalplace.js"></script>'),
+             '"/static/politicalplaces/js/politicalplaces.js"></script>'),
             str(self.modelform.media)
         )

@@ -18,7 +18,7 @@ class PlaceWidgetTest(TestCase):
         self.assertEqual(
             str(self.placewidget.media),
             ('<script type="text/javascript" '
-             'src="/static/politicalplace/js/politicalplace.js">'
+             'src="/static/politicalplaces/js/politicalplaces.js">'
              '</script>'),)
 
     def test_place_widget_render(self):

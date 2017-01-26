@@ -15,4 +15,4 @@ class PlaceWidget(TextInput):
         })
 
     class Media:
-        js = ("politicalplace/js/politicalplace.js",)
+        js = ("politicalplaces/js/politicalplaces.js",)
