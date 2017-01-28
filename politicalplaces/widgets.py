@@ -15,4 +15,9 @@ class PlaceWidget(TextInput):
         })
 
     class Media:
-        js = ("politicalplaces/js/politicalplaces.js",)
+        js = (
+            "https://maps.googleapis.com/maps/api/js?libraries=places",
+            "https://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js",
+            "politicalplaces/js/store-locator.min.js",
+            "politicalplaces/js/politicalplaces.js",)
+        css = {'all': ('politicalplaces/css/storelocator.css',)}
