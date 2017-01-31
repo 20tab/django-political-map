@@ -1,135 +1,21 @@
-
-<style>
-#map_canvas {
-	height: 300px;
-	width: 500px;
-}
-</style>
-<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-
-{{field_input}}<div id="search_map">search</div>
+{{field_input}}<div class='place-search' id="search_map_{{field_id}}">search</div>
 <div class="place-widget" style="margin-top: 4px">
-    <label></label>
-    {#<div id="map_{{field_name}}" style="width: 500px; height: 300px"></div>#}
-    <div id="panel"></div>
-    <div id="map_canvas"></div>
+    <div class='place-panel' id="panel_{{field_id}}"></div>
+    <div class='place-map-canvas' id="map_canvas_{{field_id}}" style="height: 300px; width: 500px;"></div>
 </div>
 
+<script>
+jQuery(function($) {
+  function setVariables(field_id, field_name){
+    // not working with multiple PlaceFields.
+    // Probably needing an array of variables or something...
+    panel = $('#panel_'+field_id);
+    map_canvas = document.getElementById('map_canvas_'+field_id);
+    search_map = $('#search_map_'+field_id);
+    address_input = $('#id_'+field_name);
+  }
 
-
-    <script>
-
-      var map;
-      var markers = [];
-      var default_marker = {lat: -25.363, lng: 131.044};
-      var panel = $('#panel');
-      var map_canvas = document.getElementById('map_canvas');
-      var search_map = $('#search_map');
-      var address_input = $('#id_place');
-      // var panel = document.getElementById('panel');
-      // var map_canvas = document.getElementById('map_canvas');
-      // var search_map = document.getElementById('search_map');
-      // var address_input = document.getElementById('id_place');
-
-    
-      function initMap() {
-        console.log("---initMap");
-        map = new google.maps.Map(map_canvas, {
-          zoom: 4,
-          minZoom: 2,
-          center: default_marker
-        });
-        addMarker(default_marker);
-        readInput(map);
-      }
-
-      function addAndResetMarker(location){
-        console.log("---addAndResetMarker");
-        deleteMarkers();
-        addMarker(location);
-      }
-
-      function addMarker(location){
-        console.log("---addMarker");
-        var marker = new google.maps.Marker({
-          position: location,
-          map: map
-        });
-        markers.push(marker);
-      }
-
-      function setMapOnAll(map){
-        console.log("---setMapOnAll");
-        for(var i = 0; i < markers.length; i++){
-          markers[i].setMap(map)
-        }
-      }
-
-      function clearMarkers(){
-        console.log("---clearMarkers");
-        setMapOnAll(null);
-      }
-
-      function deleteMarkers(){
-        console.log("---deleteMarkers");
-        clearMarkers();
-        markers = []
-      }
-
-      function updatePanel(results, map){
-        var html_panel = "<ul>";
-        for(var i = 0; i < results.length; i++){
-          html_panel += "<li class='result_component'>"+results[i].formatted_address+"</li>";
-        }
-        panel.html(html_panel+"</ul>");
-        $(".result_component").click(function(){
-          console.log("result_component.click");
-          console.log($(this));
-          console.log($(this).text());
-          geoCode($(this).text(), map)
-        })
-      }
-
-      function logErrorPanel(error){
-        panel.html(error);
-      }
-
-      function geoCode(address, map){
-        console.log("---geoCode");
-        var geocoder = new google.maps.Geocoder();
-        var res = geocoder.geocode(
-          {'address': address},
-          function(results, status){
-            if(status==google.maps.GeocoderStatus.OK){
-              console.log(results.length);
-              if(results.length == 1){
-                deleteMarkers();
-                console.log("aaaaa: ");
-                console.log(results);
-                map.setCenter(results[0].geometry.location);
-                if(results[0].geometry.bounds){
-                  map.fitBounds(results[0].geometry.bounds)
-                }
-                addMarker(results[0].geometry.location);
-                panel.html("");
-                address_input.val(results[0].formatted_address);
-              }else{
-                updatePanel(results, map);
-              }
-            }else{logErrorPanel("Gmaps Error:"+status);}
-          }
-        )
-      }
-
-      function readInput(map){
-        console.log("---readInput");
-        search_map.click(function(){
-            console.log('search_map.click');
-            var value = address_input.val()
-            geoCode(value, map);
-          })
-      }
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?language=en&key=AIzaSyCQbVeTVyl1eUDzJbgpoSTaCb_9wHq1kik&callback=initMap">
-    </script>
+  setVariables('{{field_id}}', '{{field_name}}');
+  initMap();
+})
+</script>

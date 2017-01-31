@@ -1,48 +1,101 @@
-google.maps.event.addDomListener(window, 'load', function() {
-  var map = new google.maps.Map(document.getElementById('map-canvas'), {
-    center: new google.maps.LatLng(-28, 135),
+var map;
+var markers = [];
+var panel;
+var map_canvas;
+var search_map;
+var address_input;
+
+
+function initMap() {
+  console.log("---initMap");
+  map = new google.maps.Map(map_canvas, {
     zoom: 4,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
+    minZoom: 2
   });
-
-  var panelDiv = document.getElementById('panel');
-
-  var data = new storeLocator.GMEDataFeed({
-    //tableId: '12421761926155747447-06672618218968397709',
-    apiKey: 'AIzaSyCQbVeTVyl1eUDzJbgpoSTaCb_9wHq1kik',
-    propertiesModifier: function(props) {
-      var shop = join([props.Shp_num_an, props.Shp_centre], ', ');
-      var locality = join([props.Locality, props.Postcode], ', ');
-
-      return {
-        id: props.uuid,
-        title: props.Fcilty_nam,
-        address: join([shop, props.Street_add, locality], '<br>'),
-        hours: props.Hrs_of_bus
-      };
-    }
-  });
-
-  var view = new storeLocator.View(map, data, {
-    geolocation: false
-  });
-
-  new storeLocator.Panel(panelDiv, {
-    view: view
-  });
-});
-
-/**
- * Joins elements of an array that are non-empty and non-null.
- * @private
- * @param {!Array} arr array of elements to join.
- * @param {string} sep the separator.
- * @return {string}
- */
-function join(arr, sep) {
-  var parts = [];
-  for (var i = 0, ii = arr.length; i < ii; i++) {
-    arr[i] && parts.push(arr[i]);
+  if(address_input.val()!=""){
+      geoCode(address_input.val(), map);
   }
-  return parts.join(sep);
+  readInput(map);
+}
+
+function addAndResetMarker(location){
+  console.log("---addAndResetMarker");
+  deleteMarkers();
+  addMarker(location);
+}
+
+function addMarker(location){
+  console.log("---addMarker");
+  var marker = new google.maps.Marker({
+    position: location,
+    map: map
+  });
+  markers.push(marker);
+}
+
+function setMapOnAll(map){
+  console.log("---setMapOnAll");
+  for(var i = 0; i < markers.length; i++){
+    markers[i].setMap(map)
+  }
+}
+
+function clearMarkers(){
+  console.log("---clearMarkers");
+  setMapOnAll(null);
+}
+
+function deleteMarkers(){
+  console.log("---deleteMarkers");
+  clearMarkers();
+  markers = []
+}
+
+function updatePanel(results, map){
+  console.log("---updatePanel: ", results);
+  var html_panel = "<ul>";
+  for(var i = 0; i < results.length; i++){
+    html_panel += "<li class='result_component'>"+results[i].formatted_address+"</li>";
+  }
+  panel.html(html_panel+"</ul>");
+  $(".result_component").click(function(){
+    geoCode($(this).text(), map)
+  })
+}
+
+function logErrorPanel(error){
+  panel.html(error);
+}
+
+function geoCode(address, map){
+  console.log("---geoCode:", address);
+  var geocoder = new google.maps.Geocoder();
+  var res = geocoder.geocode(
+    {'address': address},
+    function(results, status){
+      if(status==google.maps.GeocoderStatus.OK){
+        if(results.length == 1){
+          deleteMarkers();
+          map.setCenter(results[0].geometry.location);
+          if(results[0].geometry.bounds){
+              map.fitBounds(results[0].geometry.bounds)
+          }
+          addMarker(results[0].geometry.location);
+          panel.html("");
+          address_input.val(results[0].formatted_address);
+        }else{
+          updatePanel(results, map);
+        }
+      }else{logErrorPanel("Gmaps Error:"+status);}
+    }
+  )
+}
+
+function readInput(map){
+  console.log("---readInput");
+  search_map.click(function(){
+      console.log('search_map.click');
+      var value = address_input.val()
+      geoCode(value, map);
+    })
 }

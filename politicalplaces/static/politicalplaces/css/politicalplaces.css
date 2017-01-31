@@ -1,0 +1,17 @@
+.place-search{
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 3px;
+  background-color: #ffffcc;
+}
+.place-widget{
+}
+.result-component{
+  cursor: pointer;
+}
+.place-panel{
+  background-color: #ffffcc;
+  padding: 3px;
+}
+
+.place-map-canvas{}

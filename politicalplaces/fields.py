@@ -1,5 +1,20 @@
 from django.db.models import ForeignKey
+from django.forms import ModelChoiceField
+from .models import PoliticalPlace
 from .widgets import PlaceWidget
+
+
+class PlaceChoiceField(ModelChoiceField):
+
+    def clean(self, value):
+        fk_value = PoliticalPlace.get_or_create_from_address(value).pk
+        return super(PlaceChoiceField, self).clean(fk_value)
+
+    def prepare_value(self, value):
+        # TODO is there any way to get address without doing an extra query?
+        if value:
+            value = PoliticalPlace.objects.get(pk=value).address
+        return super(PlaceChoiceField, self).prepare_value(value)
 
 
 class PlaceField(ForeignKey):
@@ -15,6 +30,8 @@ class PlaceField(ForeignKey):
             db_constraint, **kwargs)
 
     def formfield(self, **kwargs):
-        defaults = {'widget': PlaceWidget}
+        defaults = {
+            'widget': PlaceWidget,
+            'form_class': PlaceChoiceField}
         defaults.update(kwargs)
         return super(PlaceField, self).formfield(**defaults)
