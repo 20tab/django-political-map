@@ -6,7 +6,22 @@ from .utils import country_to_continent
 from .backends import Client
 from .exceptions import GeoTypeException, NoResultsException
 from .widgets import PlaceWidget
+from .forms import PoliticalPlaceForm
 from googlemaps.exceptions import HTTPError
+
+
+class PoliticalPlaceFormTest(TestCase):
+
+    def test_form_save(self):
+        form_data = {
+            'address': "Rome, Italy",
+            'place_id': 'ChIJu46S-ZZhLxMROG5lkwZ3D7k'}
+        form = PoliticalPlaceForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        instance = form.save()
+        self.assertTrue(instance)
+        self.assertEqual(instance.country, "Italy")
+        self.assertEqual(instance.country_item.short_name, "IT")
 
 
 class PlaceWidgetTest(TestCase):

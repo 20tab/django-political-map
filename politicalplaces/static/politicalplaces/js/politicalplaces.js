@@ -8,7 +8,7 @@ google.maps.event.addDomListener(window, 'load', function() {
   var panelDiv = document.getElementById('panel');
 
   var data = new storeLocator.GMEDataFeed({
-    tableId: '12421761926155747447-06672618218968397709',
+    //tableId: '12421761926155747447-06672618218968397709',
     apiKey: 'AIzaSyCQbVeTVyl1eUDzJbgpoSTaCb_9wHq1kik',
     propertiesModifier: function(props) {
       var shop = join([props.Shp_num_an, props.Shp_centre], ', ');

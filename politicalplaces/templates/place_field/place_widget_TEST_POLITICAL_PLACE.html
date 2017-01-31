@@ -25,7 +25,10 @@
       var panel = $('#panel');
       var map_canvas = document.getElementById('map_canvas');
       var search_map = $('#search_map');
-      var address_input = $('#id_place');
+      var address_input = $('#id_address');
+      var place_id_input = $('#id_place_id');
+      console.log("PLACE ID INPUT");
+      console.log(place_id_input.html());
       // var panel = document.getElementById('panel');
       // var map_canvas = document.getElementById('map_canvas');
       // var search_map = document.getElementById('search_map');
@@ -113,6 +116,8 @@
                 addMarker(results[0].geometry.location);
                 panel.html("");
                 address_input.val(results[0].formatted_address);
+                $('#id_place_id').val(results[0].place_id);
+                console.log("place_id: " + results[0].place_id);
               }else{
                 updatePanel(results, map);
               }
