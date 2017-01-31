@@ -3,7 +3,11 @@ from .models import MyLocation
 
 
 class MyLocationAdmin(admin.ModelAdmin):
-    pass
+
+    def country(obj):
+        return obj.place.country
+
+    list_display = ('place', country)
 
 
 admin.site.register(MyLocation, MyLocationAdmin)
