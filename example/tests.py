@@ -43,20 +43,20 @@ class MyLocationTest(TestCase):
         self.assertEqual(5, MapItem.objects.count())
         self.assertEqual(2, MyLocation.objects.count())
 
-    def test_mylocation_form(self):
-        self.assertHTMLEqual(
-            """<tr><th><label for="id_place">Place:</label></th><td><input id="id_place" name="place" type="text" />
-<div class="place-widget" style="margin-top: 4px">
-    <label></label>
-    <div id="map_place" style="width: 500px; height: 250px"></div>
-</div>
-</td></tr>""",
-            str(self.modelform)
-        )
-
-    def test_mylocation_form_media(self):
-        self.assertHTMLEqual(
-            ('<script type="text/javascript" src='
-             '"/static/politicalplaces/js/politicalplaces.js"></script>'),
-            str(self.modelform.media)
-        )
+#    def test_mylocation_form(self):
+#        self.assertHTMLEqual(
+#            """<tr><th><label for="id_place">Place:</label></th><td><input id="id_place" name="place" type="text" />
+#<div class="place-widget" style="margin-top: 4px">
+#    <label></label>
+#    <div id="map_place" style="width: 500px; height: 250px"></div>
+#</div>
+#</td></tr>""",
+#            str(self.modelform)
+#        )
+#
+#    def test_mylocation_form_media(self):
+#        self.assertHTMLEqual(
+#            ('<script type="text/javascript" src='
+#             '"/static/politicalplaces/js/politicalplaces.js"></script>'),
+#            str(self.modelform.media)
+#        )
