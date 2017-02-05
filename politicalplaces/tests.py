@@ -10,40 +10,48 @@ from .widgets import PlaceWidget
 from googlemaps.exceptions import HTTPError
 
 
-#class PoliticalPlaceFormTest(TestCase):
-#
-#    def test_form_save(self):
-#        form_data = {
-#            'address': "Rome, Italy",
-#            'place_id': 'ChIJu46S-ZZhLxMROG5lkwZ3D7k'}
-#        form = PoliticalPlaceForm(data=form_data)
-#        self.assertTrue(form.is_valid())
-#        instance = form.save()
-#        self.assertTrue(instance)
-#        self.assertEqual(instance.country, "Italy")
-#        self.assertEqual(instance.country_item.short_name, "IT")
-
-
 class PlaceWidgetTest(TestCase):
+    maxDiff = None
 
     def setUp(self):
         self.placewidget = PlaceWidget()
 
-    #def test_place_widget_media(self):
-    #    self.assertEqual(
-    #        str(self.placewidget.media),
-    #        ('<script type="text/javascript" '
-    #         'src="/static/politicalplaces/js/politicalplaces.js">'
-    #         '</script>'),)
+    def test_place_widget_media(self):
+        self.assertHTMLEqual(
+            str(self.placewidget.media),
+            """<link href="/static/politicalplaces/css/politicalplaces.css" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript" src="/static/politicalplaces/js/politicalplaces.js"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?language=en&amp;key=AIzaSyCQbVeTVyl1eUDzJbgpoSTaCb_9wHq1kik"></script>"""
+        )
 
-    #def test_place_widget_render(self):
-    #    self.assertEqual(
-    #        str(self.placewidget.render('myfield', 'myvalue')),
-    #        ('<input name="myfield" type="text" value="myvalue" />\n'
-    #         '<div class="place-widget" style="margin-top: 4px">\n    '
-    #         '<label></label>\n    <div id="map_myfield" '
-    #         'style="width: 500px; height: 250px"></div>\n</div>\n')
-    #    )
+    def test_place_widget_render(self):
+        self.assertHTMLEqual(
+            str(self.placewidget.render(
+                'myfield', 'myvalue', attrs={'id': 'idtest'})),
+            """<input id='idtest' name="myfield" type="text" value="myvalue" /><div class='place-search' id="search_map_idtest">search</div>
+<div class="place-widget" style="margin-top: 4px">
+    <div class='place-panel' id="panel_idtest"></div>
+    <div class='place-map-canvas' id="map_canvas_idtest" style="height: 300px; width: 500px;"></div>
+</div>
+
+<script>
+jQuery(function($) {
+  function setVariables(field_id, field_name){
+    // not working with multiple PlaceFields.
+    // Probably needing an array of variables or something...
+    panel = $('#panel_'+field_id);
+    map_canvas = document.getElementById('map_canvas_'+field_id);
+    search_map = $('#search_map_'+field_id);
+    address_input = $('#id_'+field_name);
+  }
+
+  setVariables('idtest', 'myfield');
+  initMap();
+})
+</script>
+"""
+        )
 
 
 class BackendTest(TestCase):
@@ -78,14 +86,15 @@ class UtilsTest(TestCase):
 class PoliticalPlaceModelTest(TestCase):
 
     def setUp(self):
+        self.address = "via Luigi Gastinelli 118, Rome, Italy"
         self.test_place = PoliticalPlace(
-            address="via Luigi Gastinelli 118, Rome, Italy")
+            address=self.address)
         self.test_place_wrong_addr = PoliticalPlace(
             address="qwertyuiop")
 
     def test_unicode_str(self):
         test_place = PoliticalPlace.get_or_create_from_address(
-            self.test_place.address)
+            self.address)
         self.assertEqual(
             str(test_place),
             "Via Luigi Gastinelli, 118, 00132 Roma RM, Italy")
@@ -129,7 +138,7 @@ class PoliticalPlaceModelTest(TestCase):
 
     def test_political_place_get_or_create_from_address_fields_creation(self):
         test_place = PoliticalPlace.get_or_create_from_address(
-            self.test_place.address)
+            self.address)
         self.assertEqual(
             test_place.administrative_area_level_1,
             "Lazio")
@@ -139,7 +148,7 @@ class PoliticalPlaceModelTest(TestCase):
 
     def test_political_place_get_or_create_from_address_items_creation(self):
         test_place = PoliticalPlace.get_or_create_from_address(
-            self.test_place.address)
+            self.address)
         self.assertEqual(
             test_place.administrative_area_level_1_item.long_name,
             "Lazio")
@@ -168,6 +177,18 @@ class PoliticalPlaceModelTest(TestCase):
         self.assertEqual(
             self.test_place.continent_item.long_name,
             "Europe")
+
+    def test_refresh_data(self):
+        self.test_place.refresh_data()
+        self.assertEqual(
+            self.test_place.country_item.short_name, "IT")
+
+    def test_refresh_data_place_id(self):
+        self.test_place.place_id = "ChIJu46S-ZZhLxMROG5lkwZ3D7k"
+        self.test_place.save()
+        self.test_place.refresh_data()
+        self.assertEqual(
+            self.test_place.country_item.short_name, "IT")
 
 
 class MapItemModelTest(TestCase):

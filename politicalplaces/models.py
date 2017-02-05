@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 from django.db import models
 from django.template.defaultfilters import slugify
 from .backends import Client
-from .exceptions import NoResultsException, GeoTypeException
+from .exceptions import (
+    NoResultsException, GeoTypeException, ExistingPlaceID)
 from .utils import country_to_continent
 import json
 
@@ -219,12 +220,32 @@ class PoliticalPlace(models.Model):
             except AttributeError:
                 pass  # type is not political
 
+    def refresh_data(self):
+        """
+        if for any reason your PoliticalPlace object has only address and
+        place_id, or you need to refres geographic data from the source app
+        (googlemaps, etc.), you can perform this action.
+        This will work even with just address (python object not already
+        db object)
+        """
+        if self.place_id:
+            place = self._geocode_item(self.place_id, True)
+        else:
+            place = self._geocode_item(self.address)
+        place.save()
+
     def _process_address(self):
+        return self._geocode_item(self.address, provide_new=True)
+
+    def _geocode_item(self, to_geocode, reverse=False, provide_new=False):
         """
         Use this method to process a Place with only the address provided
         """
         client = Client()
-        geocode_result = client.geocode(self.address)
+        if reverse:
+            geocode_result = client.reverse_geocode(to_geocode)
+        else:
+            geocode_result = client.geocode(to_geocode)
         if geocode_result == []:
             raise NoResultsException("Address Not Found")
         # if results, take the first one. No way to let the user
@@ -236,10 +257,15 @@ class PoliticalPlace(models.Model):
         self.address = geocode_result['formatted_address']
         self.place_id = geocode_result['place_id']
         try:
-            existing_item = self.__class__.objects.get(place_id=self.place_id)
+            existing_item = self.__class__.objects.exclude(pk=self.pk).get(
+                place_id=self.place_id)
         except self.__class__.DoesNotExist:
             pass
         else:
+            if not provide_new:
+                raise ExistingPlaceID(
+                    "Place with place_id {} already exists.".format(
+                        self.place_id))
             return existing_item
         self.geocode = "{},{}".format(location['lat'], location['lng'])
         self.geo_type = self._get_main_type(geocode_result['types'])

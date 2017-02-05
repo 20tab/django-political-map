@@ -3,6 +3,12 @@ from .models import MapItem, PoliticalPlace
 
 
 class PoliticalPlaceAdmin(admin.ModelAdmin):
+
+    def refresh_data(modeladmin, request, queryset):
+        for place in queryset:
+            place.refresh_data()
+
+    actions = [refresh_data]
     list_display = [
         'address', 'geo_type', 'continent', 'country', 'geocode', 'place_id']
     list_filter = ['continent', 'geo_type']

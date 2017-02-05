@@ -12,7 +12,7 @@ class MyLocationTest(TestCase):
             class Meta:
                 model = MyLocation
                 exclude = []
-        self.modelform = MyLocationForm()
+        self.MyLocationForm = MyLocationForm
 
     def test_mylocation_creation(self):
         self.assertEqual(0, PoliticalPlace.objects.count())
@@ -43,20 +43,24 @@ class MyLocationTest(TestCase):
         self.assertEqual(5, MapItem.objects.count())
         self.assertEqual(2, MyLocation.objects.count())
 
-#    def test_mylocation_form(self):
-#        self.assertHTMLEqual(
-#            """<tr><th><label for="id_place">Place:</label></th><td><input id="id_place" name="place" type="text" />
-#<div class="place-widget" style="margin-top: 4px">
-#    <label></label>
-#    <div id="map_place" style="width: 500px; height: 250px"></div>
-#</div>
-#</td></tr>""",
-#            str(self.modelform)
-#        )
-#
-#    def test_mylocation_form_media(self):
-#        self.assertHTMLEqual(
-#            ('<script type="text/javascript" src='
-#             '"/static/politicalplaces/js/politicalplaces.js"></script>'),
-#            str(self.modelform.media)
-#        )
+    def test_mylocation_formfield_clean(self):
+        self.assertEqual(0, PoliticalPlace.objects.count())
+        post_data = {'place': 'via Luigi Gastinelli 118, Rome'}
+        location_form = self.MyLocationForm(data=post_data)
+        location_form.save()
+        self.assertEqual(1, PoliticalPlace.objects.count())
+
+    def test_mylocation_formfield_prepare_value(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            address='via Luigi Gastinelli, Rome')
+        location = MyLocation(place=test_place)
+        location.save()
+        location_form = self.MyLocationForm(instance=location)
+        self.assertEqual(
+            location_form['place'].value(),
+            "Via Luigi Gastinelli, 00132 Roma, Italy")
+
+    def test_mylocation_formfield_prepare_value_no_instance(self):
+        location_form = self.MyLocationForm()
+        self.assertEqual(
+            location_form['place'].value(), None)

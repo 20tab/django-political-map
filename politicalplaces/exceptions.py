@@ -4,3 +4,7 @@ class NoResultsException(Exception):
 
 class GeoTypeException(Exception):
     pass
+
+
+class ExistingPlaceID(Exception):
+    pass
