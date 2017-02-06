@@ -156,6 +156,35 @@ class PoliticalPlaceModelTest(TestCase):
             test_place.country_item.short_name,
             "IT")
 
+    def test_political_place_get_or_create_from_address_url_parent(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            "Montesacro, Rome")
+        map_item_italy = MapItem.objects.get(
+            long_name__iexact='Italy',
+            geo_type__iexact='country')
+        map_item_lazio = MapItem.objects.get(
+            long_name__iexact='Lazio',
+            geo_type__iexact='administrative_area_level_1')
+        map_item_rome_area3 = MapItem.objects.get(
+            long_name__icontains='Rome',
+            geo_type__iexact='administrative_area_level_3')
+        map_item_roma = MapItem.objects.get(
+            long_name__iexact='Rome',
+            geo_type__iexact='locality')
+        self.assertEqual(
+            test_place.administrative_area_level_1_item.relative_url,
+            "/europe/it/lazio/{}".format(map_item_lazio.pk))
+        self.assertEqual(
+            test_place.administrative_area_level_1_item.parent,
+            map_item_italy)
+        self.assertEqual(
+            test_place.locality_item.relative_url,
+            "/europe/it/lazio/rm/rome/rome/{}".format(
+                map_item_roma.pk))
+        self.assertEqual(
+            test_place.locality_item.parent,
+            map_item_rome_area3)
+
     def test_political_place_process_address_wrong(self):
         with self.assertRaises(NoResultsException):
             PoliticalPlace.get_or_create_from_address(
@@ -194,7 +223,7 @@ class PoliticalPlaceModelTest(TestCase):
 class MapItemModelTest(TestCase):
 
     def setUp(self):
-        self.test_item = MapItem.get_or_create_from_address(
+        self.test_item = MapItem.update_or_create_from_address(
             "Lazio, Italy", 'administrative_area_level_1')
 
     def test_unicode_str(self):
@@ -204,7 +233,7 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_place_id_create(self):
         place_id = "ChIJNWU6NebuJBMRKYWj8WSQSm8"
-        map_item = MapItem.get_or_create_from_place_id(place_id)
+        map_item = MapItem.update_or_create_from_place_id(place_id)
         self.assertEqual(map_item.long_name, "Lazio")
         self.assertEqual(map_item.short_name, "Lazio")
         self.assertEqual(map_item.geo_type, "administrative_area_level_1")
@@ -218,11 +247,11 @@ class MapItemModelTest(TestCase):
     def test_get_or_create_from_place_id_error(self):
         place_id = "qwertyuiop"
         with self.assertRaises(HTTPError):
-            MapItem.get_or_create_from_place_id(place_id)
+            MapItem.update_or_create_from_place_id(place_id)
 
     def test_get_or_create_from_address_create(self):
         address = "Lazio, Italy"
-        map_item = MapItem.get_or_create_from_address(
+        map_item = MapItem.update_or_create_from_address(
             address, 'administrative_area_level_1')
         self.assertEqual(map_item.long_name, "Lazio")
         self.assertEqual(map_item.short_name, "Lazio")
@@ -237,28 +266,28 @@ class MapItemModelTest(TestCase):
     def test_get_or_create_from_address_error(self):
         address = "qwertyuiop"
         with self.assertRaises(NoResultsException):
-            MapItem.get_or_create_from_address(
+            MapItem.update_or_create_from_address(
                 address, 'administrative_area_level_1')
 
     def test_get_or_create_from_address_wrong_geo_type(self):
         address = "Lazio, Italy"
         with self.assertRaises(GeoTypeException):
-            MapItem.get_or_create_from_address(
+            MapItem.update_or_create_from_address(
                 address, 'country')
 
     def test_get_or_create_from_address_get(self):
         self.assertEqual(1, MapItem.objects.count())
         address = "Calabria, Italy"
-        MapItem.get_or_create_from_address(
+        MapItem.update_or_create_from_address(
             address, 'administrative_area_level_1')
         self.assertEqual(2, MapItem.objects.count())
-        MapItem.get_or_create_from_address(
+        MapItem.update_or_create_from_address(
             address, 'administrative_area_level_1')
         self.assertEqual(2, MapItem.objects.count())
 
     def test_get_or_create_from_address_africa(self):
         address = "Kayuma"
-        map_item = MapItem.get_or_create_from_address(
+        map_item = MapItem.update_or_create_from_address(
             address, 'locality')
         self.assertEqual(map_item.long_name, "Kayuma")
         self.assertEqual(map_item.short_name, "Kayuma")
@@ -269,7 +298,7 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_address_america(self):
         address = "Dosquebradas, Pereira"
-        map_item = MapItem.get_or_create_from_address(
+        map_item = MapItem.update_or_create_from_address(
             address, 'locality')
         self.assertEqual(map_item.long_name, "Dosquebradas")
         self.assertEqual(map_item.short_name, "Dosquebradas")
@@ -280,7 +309,7 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_address_asia(self):
         address = "Tokachi District, Japan"
-        map_item = MapItem.get_or_create_from_address(
+        map_item = MapItem.update_or_create_from_address(
             address, 'locality')
         self.assertEqual(map_item.long_name, "Tokachi District")
         self.assertEqual(map_item.short_name, "Tokachi District")
@@ -291,7 +320,7 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_address_europe(self):
         address = "Hordaland, Norway"
-        map_item = MapItem.get_or_create_from_address(
+        map_item = MapItem.update_or_create_from_address(
             address, 'administrative_area_level_1')
         self.assertEqual(map_item.long_name, "Hordaland")
         self.assertEqual(map_item.short_name, "Hordaland")
@@ -302,7 +331,7 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_address_oceania(self):
         address = "Tonga"
-        map_item = MapItem.get_or_create_from_address(
+        map_item = MapItem.update_or_create_from_address(
             address, 'country')
         self.assertEqual(map_item.long_name, "Tonga")
         self.assertEqual(map_item.short_name, "TO")

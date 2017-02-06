@@ -22,7 +22,7 @@ class PoliticalPlaceAdmin(admin.ModelAdmin):
 class MapItemAdmin(admin.ModelAdmin):
     list_display = [
         'long_name', 'short_name', 'place_id',
-        'geo_type', 'geocode', 'slug', 'url']
+        'geo_type', 'geocode', 'slug', 'relative_url', 'parent']
     list_filter = ['geo_type']
     search_fields = [
         'place_id', 'long_name', 'short_name',

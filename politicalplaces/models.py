@@ -33,9 +33,31 @@ class MapItem(models.Model):
     geocode = models.CharField(max_length=255)
     slug = models.SlugField()
     url = models.CharField(max_length=255, blank=True)
+    parent = models.ForeignKey(
+        'self', blank=True, null=True, on_delete=models.SET_NULL)
 
     @classmethod
-    def get_or_create_from_place_id(cls, place_id, url=''):
+    def _update_or_create_item(cls, geocode_result, types_list, url, parent):
+        address_components = geocode_result['address_components'][0]
+        location = geocode_result['geometry']['location']
+        slug = slugify(address_components['short_name'])
+        mapitem, created = cls.objects.update_or_create(
+            place_id=geocode_result['place_id'],
+            defaults={
+                'long_name': address_components['long_name'],
+                'short_name': address_components['short_name'],
+                'geo_type': types_list[0],
+                'types': ",".join(types_list),
+                'response_json': json.dumps(geocode_result),
+                'geocode': "{},{}".format(location['lat'], location['lng']),
+                'slug': slug,
+                'url': "{}/{}".format(url, slug),
+                'parent': parent,
+            })
+        return mapitem
+
+    @classmethod
+    def update_or_create_from_place_id(cls, place_id, url='', parent=None):
         """
         geocodes provided place_id and builds the url adding the slug.
         All returned types are stored as comma separated slugs in
@@ -47,25 +69,10 @@ class MapItem(models.Model):
         # choose between different solutions, like in the frontend form
         geocode_result = geocode_result[0]
         types_list = geocode_result['types']
-        address_components = geocode_result['address_components'][0]
-        location = geocode_result['geometry']['location']
-        slug = slugify(address_components['long_name'])
-        mapitem, created = cls.objects.get_or_create(
-            place_id=geocode_result['place_id'],
-            defaults={
-                'long_name': address_components['long_name'],
-                'short_name': address_components['short_name'],
-                'geo_type': types_list[0],
-                'types': ",".join(types_list),
-                'response_json': json.dumps(geocode_result),
-                'geocode': "{},{}".format(location['lat'], location['lng']),
-                'slug': slug,
-                'url': "{}/{}".format(url, slug)
-            })
-        return mapitem
+        return cls._update_or_create_item(geocode_result, types_list, url, parent)
 
     @classmethod
-    def get_or_create_from_address(cls, address, geo_type, url=''):
+    def update_or_create_from_address(cls, address, geo_type, url='', parent=None):
         """
         geocodes provided address, checks if attended geo_type is
         in results and builds the url adding the slug.
@@ -86,22 +93,11 @@ class MapItem(models.Model):
             raise GeoTypeException(
                 "Geographical type {} not found in results {}".format(
                     geo_type, types_list))
-        address_components = geocode_result['address_components'][0]
-        location = geocode_result['geometry']['location']
-        slug = slugify(address_components['long_name'])
-        mapitem, created = cls.objects.get_or_create(
-            place_id=geocode_result['place_id'],
-            defaults={
-                'long_name': address_components['long_name'],
-                'short_name': address_components['short_name'],
-                'geo_type': geo_type,
-                'types': ",".join(types_list),
-                'response_json': json.dumps(geocode_result),
-                'geocode': "{},{}".format(location['lat'], location['lng']),
-                'slug': slug,
-                'url': "{}/{}".format(url, slug)
-            })
-        return mapitem
+        return cls._update_or_create_item(geocode_result, types_list, url, parent)
+
+    @property
+    def relative_url(self):
+        return "{}/{}".format(self.url, self.pk)
 
     def __str__(self):
         return "{}({})".format(self.long_name, self.geo_type)
@@ -202,21 +198,28 @@ class PoliticalPlace(models.Model):
         # self already has administrative levels filled
         # run reverse geocoding
         reverse_results = client.reverse_geocode((lat, lng))
+        # set url and parent to use in item for cycle
+        url = ''
+        parent = None
         # first set the continent, usually not a political place
         if self.continent not in (None, ""):
-            continent_item = MapItem.get_or_create_from_address(
+            continent_item = MapItem.update_or_create_from_address(
                 self.continent, 'continent')
             self.continent_item = continent_item
+            url += continent_item.url
+            parent = continent_item
         # then, for each result
-        for item in reverse_results:
+        for item in reverse_results[::-1]:
             # if its related field is not empty
             t = self._get_main_type(item['types'])
             try:
                 if getattr(self, t) not in (None, ""):
                     # get_or_create map item from place_id
-                    map_item = MapItem.get_or_create_from_place_id(
-                        item['place_id'])
+                    map_item = MapItem.update_or_create_from_place_id(
+                        item['place_id'], url=url, parent=parent)
                     setattr(self, "{}_item".format(t), map_item)
+                    url = map_item.url
+                    parent = map_item
             except AttributeError:
                 pass  # type is not political
 
