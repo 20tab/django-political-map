@@ -22,9 +22,11 @@ git version:
   
   - set mandatory parameters in your settings file:
 ```python
-# BACKEND
+# BACKEND (googlemaps is the only available backend)
 POLITICAL_MAP_BACKEND = 'googlemaps'
-# GMAPS
+# MAP LANGUAGE (en is the only available language)
+POLITICAL_MAP_LANGUAGE_CODE = 'en'
+# GMAPS (gmaps key is mandatory)
 GOOGLE_API_KEY = "xxxxxxxxxxxxxxxx"
 ```
   
