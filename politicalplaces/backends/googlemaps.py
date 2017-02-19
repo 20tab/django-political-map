@@ -10,6 +10,6 @@ class Client(GmapsClient):
 
     def geocode(self, address=None, components=None,
                 bounds=None, region=None,
-                language=settings.LANGUAGE_CODE):
+                language=settings.POLITICAL_MAP_LANGUAGE_CODE):
         return super(Client, self).geocode(
             address, components, bounds, region, language)

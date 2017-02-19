@@ -18,6 +18,9 @@ import os
 # BACKEND
 POLITICAL_MAP_BACKEND = 'googlemaps'
 
+# MAP LANGUAGE
+POLITICAL_MAP_LANGUAGE_CODE = 'en'
+
 # GMAPS
 GOOGLE_API_KEY = "AIzaSyCQbVeTVyl1eUDzJbgpoSTaCb_9wHq1kik"
 
