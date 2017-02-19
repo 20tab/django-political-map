@@ -17,7 +17,9 @@ If you want to try it in your project, you can install the
 git version:
 
   - ```pip install git+https://github.com/20tab/django-political-map.git```
+  
   - add ```politicalplaces``` in your INSTALLED_APPS
+  
   - set mandatory parameters in your settings file:
 ```python
 # BACKEND
@@ -25,8 +27,14 @@ POLITICAL_MAP_BACKEND = 'googlemaps'
 # GMAPS
 GOOGLE_API_KEY = "xxxxxxxxxxxxxxxx"
 ```
-  - run migrations to update your db ```python manage.py migrate```
   
+  - run migrations to update your db **python manage.py migrate**
+  
+  - manage static files using:
+    - django **collectstatic** or  
+    - uwsgi **static-map = /static/politicalplaces/=%(lib)/politicalplaces/static/politicalplaces**
+    
+
 How to
 ------
 There is one only entry point to the app, that is the **Placefield**
