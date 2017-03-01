@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from googlemaps import Client as GmapsClient
 from django.conf import settings
 
