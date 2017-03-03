@@ -28,6 +28,8 @@ POLITICAL_MAP_BACKEND = 'googlemaps'
 POLITICAL_MAP_LANGUAGE_CODE = 'en'
 # GMAPS (gmaps key is mandatory)
 GOOGLE_API_KEY = "xxxxxxxxxxxxxxxx"
+# POLITICAL_MAP_JQUERY_LIB (tested on "https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js")
+POLITICAL_MAP_JQUERY_LIB = "yyyyyyyyyyyyyy"
 ```
   
   - run migrations to update your db **python manage.py migrate**

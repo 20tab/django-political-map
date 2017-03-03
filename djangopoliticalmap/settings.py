@@ -24,6 +24,8 @@ POLITICAL_MAP_LANGUAGE_CODE = 'en'
 # GMAPS
 GOOGLE_API_KEY = "AIzaSyCQbVeTVyl1eUDzJbgpoSTaCb_9wHq1kik"
 
+# JQUERY
+POLITICAL_MAP_JQUERY_LIB = "https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

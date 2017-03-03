@@ -23,7 +23,7 @@ class PlaceWidget(TextInput):
 
     class Media:
         js = (
-            "https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js",
+            settings.POLITICAL_MAP_JQUERY_LIB,
             "politicalplaces/js/politicalplaces.js",
             ("https://maps.googleapis.com/maps/api/js"
              "?language={}&key={}").format(
