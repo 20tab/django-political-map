@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import MyLocation, MyLocationMultiPlace
+from .models import (
+    MyLocation, MyLocationMultiPlace,
+    MyLocationInlineTest, MyLocationInlinePlace)
+
+
+class MyLocationInlinePlace(admin.TabularInline):
+    model = MyLocationInlinePlace
 
 
 class MyLocationAdmin(admin.ModelAdmin):
@@ -15,5 +21,11 @@ class MyLocationMultiPlaceAdmin(admin.ModelAdmin):
     list_display = ('place1', 'place2')
 
 
+class MyLocationInlineAdmin(MyLocationAdmin):
+
+    inlines = [MyLocationInlinePlace]
+
+
 admin.site.register(MyLocation, MyLocationAdmin)
 admin.site.register(MyLocationMultiPlace, MyLocationMultiPlaceAdmin)
+admin.site.register(MyLocationInlineTest, MyLocationInlineAdmin)

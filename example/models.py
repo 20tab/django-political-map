@@ -17,3 +17,16 @@ class MyLocationMultiPlace(models.Model):
         on_delete=models.SET_NULL,
         related_name="mylocation_places2",
         null=True, blank=True)
+
+
+class MyLocationInlineTest(MyLocation):
+
+    class Meta:
+        proxy = True
+
+
+class MyLocationInlinePlace(models.Model):
+    parent_location = models.ForeignKey(MyLocation)
+    place = PlaceField(
+        on_delete=models.SET_NULL,
+        null=True, blank=True)
