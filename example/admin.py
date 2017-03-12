@@ -11,7 +11,9 @@ class MyLocationInlinePlace(admin.TabularInline):
 class MyLocationAdmin(admin.ModelAdmin):
 
     def country(obj):
-        return obj.place.country
+        if obj.place:
+            return obj.place.country
+        return None
 
     list_display = ('place', country)
 

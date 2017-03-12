@@ -7,7 +7,9 @@ from .widgets import PlaceWidget
 class PlaceChoiceField(ModelChoiceField):
 
     def clean(self, value):
-        fk_value = PoliticalPlace.get_or_create_from_address(value).pk
+        fk_value = value
+        if value not in ("", None):
+            fk_value = PoliticalPlace.get_or_create_from_address(value).pk
         return super(PlaceChoiceField, self).clean(fk_value)
 
     def prepare_value(self, value):

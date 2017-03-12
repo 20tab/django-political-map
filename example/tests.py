@@ -64,3 +64,7 @@ class MyLocationTest(TestCase):
         location_form = self.MyLocationForm()
         self.assertEqual(
             location_form['place'].value(), None)
+
+    def test_mylocation_null(self):
+        my_location = MyLocation.objects.create()
+        self.assertTrue(my_location)
