@@ -75,6 +75,8 @@ class UtilsTest(TestCase):
         self.assertEqual(
             "Europe", country_to_continent("Italy"))
         self.assertEqual(
+            "Europe", country_to_continent("Czechia"))
+        self.assertEqual(
             "Africa", country_to_continent("Senegal"))
         self.assertEqual(
             "South America", country_to_continent("Colombia"))
@@ -145,6 +147,19 @@ class PoliticalPlaceModelTest(TestCase):
         self.assertEqual(
             test_place.country,
             "Italy")
+
+    def test_political_place_get_or_create_from_address_fields_creation2(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            "Praha")
+        self.assertEqual(
+            test_place.locality,
+            "Prague")
+        self.assertEqual(
+            test_place.country,
+            "Czechia")
+        self.assertEqual(
+            test_place.continent,
+            "Europe")
 
     def test_political_place_get_or_create_from_address_items_creation(self):
         test_place = PoliticalPlace.get_or_create_from_address(
