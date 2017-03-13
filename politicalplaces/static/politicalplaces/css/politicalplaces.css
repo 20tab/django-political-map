@@ -1,11 +1,7 @@
-.place-search{
-  cursor: pointer;
-  display: inline-block;
-  margin-left: 3px;
-  background-color: #ffffcc;
+.widget__search{
+  padding: 6px 15px !important;
 }
-.place-widget{
-}
+
 .result-component{
   cursor: pointer;
 }
@@ -14,4 +10,7 @@
   padding: 3px;
 }
 
-.place-map-canvas{}
+.widget__place__map{
+  height: 300px;
+  width: 500px;
+}
