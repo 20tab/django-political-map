@@ -16,8 +16,8 @@ var politicalplaces = (function() {
     for (var i = widgetsDOMElements.length - 1; i >= 0; i--) {
       addNewWidget(widgetsDOMElements[i]);
     }
-    if (django && django.jQuery) {
-      django.jQuery(document).on('formset:added', onFormsetAdded);
+    if (window.django && window.django.jQuery) {
+      window.django.jQuery(document).on('formset:added', onFormsetAdded);
     }
   }
 
