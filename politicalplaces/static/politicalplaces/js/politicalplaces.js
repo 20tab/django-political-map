@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
   politicalplaces.init();  
+  django.jQuery(document).on('formset:added', function(evt, row, formset_name) {
+    politicalplaces.addNewWidget(row[0].querySelector('.widget'), formset_name);
+  });
 });
 
 var politicalplaces = (function() {
@@ -13,9 +16,11 @@ var politicalplaces = (function() {
   function init() {
     var widgetsDOMElements = document.querySelectorAll('.widget');
     for (var i = widgetsDOMElements.length - 1; i >= 0; i--) {
-      addWidgetToList(widgetsDOMElements[i]);
+      addNewWidget(widgetsDOMElements[i]);
     }
-    django.jQuery(document).on('formset:added', onFormsetAdded);
+    // if (django && django.jQuery) {
+      // django.jQuery(document).on('formset:added', onFormsetAdded);
+    // }
   }
 
   function addEventListeners(widget) {
@@ -40,7 +45,7 @@ var politicalplaces = (function() {
   }
   
   function onFormsetAdded(evt, row, formset_name) {
-    addWidgetToList(row[0].querySelector('.widget'), formset_name);
+    addNewWidget(row[0].querySelector('.widget'), formset_name);
   }
 
   function onInputKeyDown(evt) {
@@ -51,7 +56,7 @@ var politicalplaces = (function() {
       widget.search_button.click();
     }
   }
-  function addWidgetToList(widgetDOMElement, formset_name) {
+  function addNewWidget(widgetDOMElement, formset_name) {
     var widget = {};
     widget.panel = widgetDOMElement.querySelector('.widget__place__panel');
     widget.map_canvas = widgetDOMElement.querySelector('.widget__place__map');
@@ -147,5 +152,6 @@ var politicalplaces = (function() {
 
   return {
     init: init,
+    addNewWidget: addNewWidget,
   };
 }());
