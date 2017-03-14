@@ -69,7 +69,7 @@ ROOT_URLCONF = 'djangopoliticalmap.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['example/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -7,6 +7,12 @@ class MyLocation(models.Model):
         on_delete=models.SET_NULL,
         null=True, blank=True)
 
+    def __str__(self):
+        return self.__unicode__()
+
+    def __unicode__(self):
+        return str(self.place)
+
 
 class MyLocationMultiPlace(models.Model):
     place1 = PlaceField(

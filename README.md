@@ -40,7 +40,7 @@ GOOGLE_API_KEY = "xxxxxxxxxxxxxxxx"
 How to
 ------
 There is one only entry point to the app, that is the **Placefield**
-This field is a Foreign Key to PoliticalPlace, so you shoudl use it 
+This field is a Foreign Key to PoliticalPlace, so you should use it 
 this way:
 ```python
 from django.db import models                                                
@@ -54,3 +54,18 @@ class MyLocation(models.Model):
 ```
 PoliticalPlace and MapItem admin are available, but you should never add
 these objects directly.
+
+Using PoliticalPlace in the views
+---------------------------------
+```python
+from politicalplaces.models import PoliticalPlace
+from .models import MyLocation
+
+
+loc = MyLocation()
+loc.name = "Test Location"
+place = PoliticalPlace.get_or_create_from_address(
+    address='via Luigi Gastinelli, Rome')
+loc.place = place
+loc.save()
+```
