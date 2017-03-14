@@ -32,3 +32,9 @@
 .panel__result:hover{
   background-color: #f6f6f6;
 }
+.widget__place__map .gm-style{
+  background-image: url('../img/searchplace.png') ;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
