@@ -22,7 +22,7 @@ POLITICAL_MAP_BACKEND = 'googlemaps'
 POLITICAL_MAP_LANGUAGE_CODE = 'en'
 
 # GMAPS
-GOOGLE_API_KEY = "AIzaSyCQbVeTVyl1eUDzJbgpoSTaCb_9wHq1kik"
+GOOGLE_API_KEY = "AIzaSyBUSalEfGXgegMLzcZGSx45YT01okoRfOs"
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
