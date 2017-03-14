@@ -82,7 +82,7 @@ use {{forms.media}} in your template).
 The library also supports django inline formsets via the `formset:added`
 event if using `django.jQuery` ("admin/js/vendor/jquery/jquery.js", "admin/js/jquery.init.js"),
 otherwise you can attach to your custom event the
-`politicalplaces.addNewWidget(widgetDOMElement, formsetName) handler. 
+`politicalplaces.addNewWidget(widgetDOMElement, formsetName)` handler. 
 
 GMAPS quota limit
 -----------------
