@@ -69,3 +69,21 @@ place = PoliticalPlace.get_or_create_from_address(
 loc.place = place
 loc.save()
 ```
+
+Javascript Initialization
+--------------------------
+Django Political Map as full support for single PlaceField,
+multiple PlaceField on the same model and inline models with PlaceField.
+
+The default widget will work on your custom frontend too (just remember to
+use {{forms.media}} in your template.
+
+If you need to initialize the library: `politicalplaces.init()`.
+The library also supports django inline formsets via the `formset:added` event if using `django.jQuery`,
+otherwise you can attach to your custom event the handler 
+`politicalplaces.addNewWidget(widgetDOMElement, formsetName)
+
+GMAPS quota limit
+-----------------
+Using googlemaps as backend, remember there's a quota limit
+as described here: https://developers.google.com/maps/documentation/javascript/usage
