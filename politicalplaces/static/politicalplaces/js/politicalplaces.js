@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
-  politicalplaces.init();  
-  django.jQuery(document).on('formset:added', function(evt, row, formset_name) {
-    politicalplaces.addNewWidget(row[0].querySelector('.widget'), formset_name);
-  });
+  politicalplaces.init();
+  // django.jQuery(document).on('formset:added', function(evt, row, formset_name) {
+  //   politicalplaces.addNewWidget(row[0].querySelector('.widget'), formset_name);
+  // });
 });
 
 var politicalplaces = (function() {
@@ -18,9 +18,9 @@ var politicalplaces = (function() {
     for (var i = widgetsDOMElements.length - 1; i >= 0; i--) {
       addNewWidget(widgetsDOMElements[i]);
     }
-    // if (django && django.jQuery) {
-      // django.jQuery(document).on('formset:added', onFormsetAdded);
-    // }
+    if (django && django.jQuery) {
+      django.jQuery(document).on('formset:added', onFormsetAdded);
+    }
   }
 
   function addEventListeners(widget) {
