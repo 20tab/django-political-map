@@ -1,10 +1,3 @@
-document.addEventListener("DOMContentLoaded", function() {
-  politicalplaces.init();
-  // django.jQuery(document).on('formset:added', function(evt, row, formset_name) {
-  //   politicalplaces.addNewWidget(row[0].querySelector('.widget'), formset_name);
-  // });
-});
-
 var politicalplaces = (function() {
   'use strict';
 
