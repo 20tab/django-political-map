@@ -83,6 +83,15 @@ The library also supports django inline formsets via the `formset:added`
 event if using `django.jQuery` ("admin/js/vendor/jquery/jquery.js", "admin/js/jquery.init.js"),
 otherwise you can attach to your custom event the
 `politicalplaces.addNewWidget(widgetDOMElement, formsetName)` handler. 
+Example:
+```
+document.querySelector('button.add-form').addEventListener('click', function() {
+  var formsetName = 'the_name_of_the_formset';
+  var widgetDOMElement = document.querySelector('.widget');
+  politicalplaces.addNewWidget(widgetDOMElement, formsetName);
+});
+```
+
 
 GMAPS quota limit
 -----------------
