@@ -105,8 +105,8 @@ var politicalplaces = (function() {
   }
 
   function deleteMarkers(widget) {
-    clearMarkers(widget);
     widget.markers = [];
+    clearMarkers(widget);
   }
 
   function updatePanel(results, widget) {
