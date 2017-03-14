@@ -23,7 +23,7 @@ class PlaceWidget(TextInput):
 
     class Media:
         js = (
-            settings.POLITICAL_MAP_JQUERY_LIB,
+            # settings.POLITICAL_MAP_JQUERY_LIB,
             # "politicalplaces/js/main.js",
             # "politicalplaces/js/map.js",
             "politicalplaces/js/politicalplaces.js",
