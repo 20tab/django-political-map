@@ -94,19 +94,21 @@ var politicalplaces = (function() {
     widget.markers.push(marker);
   }
 
-  function setMapOnAll(widget) {
-    for (var i = widget.markers.length - 1; i >= 0; i--) {
-      widget.markers[i].setMap(widget.map);
+  function setMapOnAll(widget, delete_marker) {
+    if (widget.markers) {
+      for (var i = widget.markers.length - 1; i >= 0; i--) {
+        widget.markers[i].setMap(delete_marker ? null : widget.map);
+      }
     }
   }
 
   function clearMarkers(widget) {
-    setMapOnAll(widget);
+    setMapOnAll(widget, true);
   }
 
   function deleteMarkers(widget) {
-    widget.markers = [];
     clearMarkers(widget);
+    widget.markers = [];
   }
 
   function updatePanel(results, widget) {
