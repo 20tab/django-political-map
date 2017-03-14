@@ -24,9 +24,9 @@ class PlaceWidget(TextInput):
     class Media:
         js = (
             settings.POLITICAL_MAP_JQUERY_LIB,
-            "politicalplaces/js/main.js",
-            "politicalplaces/js/map.js",
-            # "politicalplaces/js/politicalplaces.js",
+            # "politicalplaces/js/main.js",
+            # "politicalplaces/js/map.js",
+            "politicalplaces/js/politicalplaces.js",
             ("https://maps.googleapis.com/maps/api/js"
              "?language={}&key={}").format(
                 settings.POLITICAL_MAP_LANGUAGE_CODE[:2], settings.GOOGLE_API_KEY),
