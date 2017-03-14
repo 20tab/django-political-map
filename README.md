@@ -72,16 +72,17 @@ loc.save()
 
 Javascript Initialization
 --------------------------
-Django Political Map has full support for single PlaceField,
-multiple PlaceField on the same model and inline models with PlaceField.
+Django Political Map has full support for admin change_form with
+single PlaceField, multiple PlaceField on the same model and
+inline models with PlaceField.
 
 The default widget will work on your custom frontend too (just remember to
 use {{forms.media}} in your template).
 
 The library also supports django inline formsets via the `formset:added`
-event if using `django.jQuery` ("admin/js/vendor/jquery/jquery.js", "admin/js/jquery.init.js",),
-otherwise you can attach to your custom event the handler 
-`politicalplaces.addNewWidget(widgetDOMElement, formsetName)
+event if using `django.jQuery` ("admin/js/vendor/jquery/jquery.js", "admin/js/jquery.init.js"),
+otherwise you can attach to your custom event the
+`politicalplaces.addNewWidget(widgetDOMElement, formsetName) handler. 
 
 GMAPS quota limit
 -----------------
