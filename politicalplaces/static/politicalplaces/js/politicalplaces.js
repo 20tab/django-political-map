@@ -1,17 +1,16 @@
-$(function($) {
-  politicalplaces.init();
+document.addEventListener("DOMContentLoaded", function() {
+  politicalplaces.init();  
 });
 
 var politicalplaces = (function() {
   'use strict';
 
   var widgets = [];
-  var options = {};
-  function init() {
-    var options = {
+  var options = {
       map_zoom: 4,
       map_min_zoom: 2,
-    };
+  };
+  function init() {
     var widgetsDOMElements = document.querySelectorAll('.widget');
     for (var i = widgetsDOMElements.length - 1; i >= 0; i--) {
       addWidgetToList(widgetsDOMElements[i]);
@@ -22,6 +21,7 @@ var politicalplaces = (function() {
   function addEventListeners(widget) {
       widget.search_button.addEventListener('click', onSearchClick);
       widget.panel.addEventListener('click', onResultClick);
+      widget.address_input.addEventListener('keydown', onInputKeyDown);
   }
 
   function onSearchClick(evt) {
@@ -43,6 +43,14 @@ var politicalplaces = (function() {
     addWidgetToList(row[0].querySelector('.widget'), formset_name);
   }
 
+  function onInputKeyDown(evt) {
+    var id = evt.currentTarget.parentElement.getAttribute('data-id');
+    var widget = widgets.find(function(widget) { return widget.id === id })
+    if (evt.keyCode === 13) {
+      evt.preventDefault();
+      widget.search_button.click();
+    }
+  }
   function addWidgetToList(widgetDOMElement, formset_name) {
     var widget = {};
     widget.panel = widgetDOMElement.querySelector('.widget__place__panel');
