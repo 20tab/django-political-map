@@ -192,7 +192,10 @@ class PoliticalPlace(models.Model):
         for t in POLITICAL_TYPES:
             if t in types:
                 return t
-        return types[0]
+        try:
+            return types[0]
+        except IndexError:
+            return ""
 
     def _create_map_items(self, client, lat, lng):
         # self already has administrative levels filled
@@ -272,7 +275,7 @@ class PoliticalPlace(models.Model):
             return existing_item
         self.geocode = "{},{}".format(location['lat'], location['lng'])
         self.geo_type = self._get_main_type(geocode_result['types'])
-        self.types = geocode_result['types']
+        self.types = geocode_result['types'] or ""
         self.response_json = json.dumps(geocode_result)
         for component in address_components[::-1]:
             for t in POLITICAL_TYPES:

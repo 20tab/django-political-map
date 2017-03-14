@@ -161,6 +161,20 @@ class PoliticalPlaceModelTest(TestCase):
             test_place.continent,
             "Europe")
 
+    def test_political_place_get_or_create_from_address_bug_notypes(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            "Largo Arquata del Tronto, 00156 Roma, Italy")
+        test_place.refresh_from_db()
+        self.assertEqual(
+            test_place.geo_type,
+            "")
+        self.assertEqual(
+            test_place.types,
+            "")
+        self.assertEqual(
+            test_place.country,
+            "Italy")
+
     def test_political_place_get_or_create_from_address_items_creation(self):
         test_place = PoliticalPlace.get_or_create_from_address(
             self.address)
