@@ -1,101 +1,141 @@
-var map;
-var markers = [];
-var panel;
-var map_canvas;
-var search_map;
-var address_input;
+$(function($) {
+  politicalplaces.init();
+});
 
+var politicalplaces = (function() {
+  'use strict';
 
-function initMap() {
-  console.log("---initMap");
-  map = new google.maps.Map(map_canvas, {
-    zoom: 4,
-    minZoom: 2
-  });
-  if(address_input.val()!=""){
-      geoCode(address_input.val(), map);
-  }
-  readInput(map);
-}
-
-function addAndResetMarker(location){
-  console.log("---addAndResetMarker");
-  deleteMarkers();
-  addMarker(location);
-}
-
-function addMarker(location){
-  console.log("---addMarker");
-  var marker = new google.maps.Marker({
-    position: location,
-    map: map
-  });
-  markers.push(marker);
-}
-
-function setMapOnAll(map){
-  console.log("---setMapOnAll");
-  for(var i = 0; i < markers.length; i++){
-    markers[i].setMap(map)
-  }
-}
-
-function clearMarkers(){
-  console.log("---clearMarkers");
-  setMapOnAll(null);
-}
-
-function deleteMarkers(){
-  console.log("---deleteMarkers");
-  clearMarkers();
-  markers = []
-}
-
-function updatePanel(results, map){
-  console.log("---updatePanel: ", results);
-  var html_panel = "<ul>";
-  for(var i = 0; i < results.length; i++){
-    html_panel += "<li class='result_component'>"+results[i].formatted_address+"</li>";
-  }
-  panel.html(html_panel+"</ul>");
-  $(".result_component").click(function(){
-    geoCode($(this).text(), map)
-  })
-}
-
-function logErrorPanel(error){
-  panel.html(error);
-}
-
-function geoCode(address, map){
-  console.log("---geoCode:", address);
-  var geocoder = new google.maps.Geocoder();
-  var res = geocoder.geocode(
-    {'address': address},
-    function(results, status){
-      if(status==google.maps.GeocoderStatus.OK){
-        if(results.length == 1){
-          deleteMarkers();
-          map.setCenter(results[0].geometry.location);
-          if(results[0].geometry.bounds){
-              map.fitBounds(results[0].geometry.bounds)
-          }
-          addMarker(results[0].geometry.location);
-          panel.html("");
-          address_input.val(results[0].formatted_address);
-        }else{
-          updatePanel(results, map);
-        }
-      }else{logErrorPanel("Gmaps Error:"+status);}
+  var widgets = [];
+  var options = {};
+  function init() {
+    var options = {
+      map_zoom: 4,
+      map_min_zoom: 2,
+    };
+    var widgetsDOMElements = document.querySelectorAll('.widget');
+    for (var i = widgetsDOMElements.length - 1; i >= 0; i--) {
+      addWidgetToList(widgetsDOMElements[i]);
     }
-  )
-}
+    django.jQuery(document).on('formset:added', onFormsetAdded);
+  }
 
-function readInput(map){
-  console.log("---readInput");
-  search_map.click(function(){
-      console.log('search_map.click');
-      var value = address_input.val()
-      geoCode(value, map);
-    })
-}
+  function addEventListeners(widget) {
+      widget.search_button.addEventListener('click', onSearchClick);
+      widget.panel.addEventListener('click', onResultClick);
+  }
+
+  function onSearchClick(evt) {
+    var id = evt.currentTarget.parentElement.getAttribute('data-id');
+    var widget = widgets.find(function(widget) { return widget.id === id })
+    var query = widget.address_input.value;
+    geoCode(query, widget);
+  }
+  
+  function onResultClick(evt) {
+    var id = evt.currentTarget.parentElement.parentElement.getAttribute('data-id');
+    var widget = widgets.find(function(widget) { return widget.id === id })
+    if (evt.target.classList.contains('panel__result')) {
+      geoCode(evt.target.innerText, widget);
+    }
+  }
+  
+  function onFormsetAdded(evt, row, formset_name) {
+    addWidgetToList(row[0].querySelector('.widget'), formset_name);
+  }
+
+  function addWidgetToList(widgetDOMElement, formset_name) {
+    var widget = {};
+    widget.panel = widgetDOMElement.querySelector('.widget__place__panel');
+    widget.map_canvas = widgetDOMElement.querySelector('.widget__place__map');
+    widget.search_button = widgetDOMElement.querySelector('.widget__search');
+    widget.address_input = widgetDOMElement.querySelector('input'); //this needs a class      
+    widget.map = new google.maps.Map(widget.map_canvas, {
+      zoom: options.map_zoom,
+      minZoom: options.map_min_zoom,
+    });
+    // if the widget is added from an inline formset, get the id from the dynamically added input name...
+    if (widgetDOMElement.getAttribute('data-id').indexOf('__prefix__') >= -1 && formset_name) {
+      widget.id = widget.address_input.id;
+      // and update the data-id;
+      widgetDOMElement.setAttribute('data-id', widget.id);
+    // ...otherwise get it from the data-id of the template
+    } else {
+      widget.id = widgetDOMElement.getAttribute('data-id');
+    }
+
+    if (widget.address_input.value !== '') {
+      geoCode(widget.address_input.value, widget);
+    }
+    addEventListeners(widget);
+    widgets.push({
+      id: widget.id,
+      panel: widget.panel,
+      map_canvas: widget.map_canvas,
+      search_button: widget.search_button,
+      address_input: widget.address_input,
+      map: widget.map,
+      markers: [],
+    });
+  }
+
+  function addMarker(location, widget) {
+    var marker = new google.maps.Marker({
+      position: location,
+      map: widget.map,
+    });
+    widget.markers.push(marker);
+  }
+
+  function setMapOnAll(widget) {
+    for (var i = widget.markers.length - 1; i >= 0; i--) {
+      widget.markers[i].setMap(widget.map);
+    }
+  }
+
+  function clearMarkers(widget) {
+    setMapOnAll(widget);
+  }
+
+  function deleteMarkers(widget) {
+    clearMarkers(widget);
+    widget.markers = [];
+  }
+
+  function updatePanel(results, widget) {
+    var html_panel = '<ul>';
+    for (var i = 0; i < results.length; i++){
+      html_panel += '<li class="panel__result">' + results[i].formatted_address + '</li>';
+    }
+    widget.panel.innerHTML = html_panel + '</ul>';
+  }
+
+  function logErrorPanel(error, widget){
+    widget.panel.innerHTML = '<ul><li>' + error + '</li></ul>';
+  }
+
+  function geoCode(address, widget) {
+    var geocoder = new google.maps.Geocoder();
+    var res = geocoder.geocode({ address: address }, function(results, status) {
+      if (status === google.maps.GeocoderStatus.OK) {
+        if (results.length === 1) {
+          deleteMarkers(widget);
+          widget.map.setCenter(results[0].geometry.location);
+          if (results[0].geometry.bounds) {
+            widget.map.fitBounds(results[0].geometry.bounds)
+          }
+          addMarker(results[0].geometry.location, widget);
+          widget.panel.innerHTML = '';
+          widget.address_input.value = results[0].formatted_address;
+        } else {
+          updatePanel(results, widget)
+        }
+      } else {
+        logErrorPanel('Gmaps Error: ' + status, widget);
+      }
+    });
+  }
+
+  return {
+    init: init,
+  };
+}());
