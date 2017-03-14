@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
-  politicalplaces.init();  
-  django.jQuery(document).on('formset:added', function(evt, row, formset_name) {
-    politicalplaces.addNewWidget(row[0].querySelector('.widget'), formset_name);
-  });
+  politicalplaces.init();
+  // django.jQuery(document).on('formset:added', function(evt, row, formset_name) {
+  //   politicalplaces.addNewWidget(row[0].querySelector('.widget'), formset_name);
+  // });
 });
 
 var politicalplaces = (function() {
@@ -13,14 +13,15 @@ var politicalplaces = (function() {
       map_zoom: 4,
       map_min_zoom: 2,
   };
+
   function init() {
     var widgetsDOMElements = document.querySelectorAll('.widget');
     for (var i = widgetsDOMElements.length - 1; i >= 0; i--) {
       addNewWidget(widgetsDOMElements[i]);
     }
-    // if (django && django.jQuery) {
-      // django.jQuery(document).on('formset:added', onFormsetAdded);
-    // }
+    if (django && django.jQuery) {
+      django.jQuery(document).on('formset:added', onFormsetAdded);
+    }
   }
 
   function addEventListeners(widget) {
@@ -56,6 +57,7 @@ var politicalplaces = (function() {
       widget.search_button.click();
     }
   }
+
   function addNewWidget(widgetDOMElement, formset_name) {
     var widget = {};
     widget.panel = widgetDOMElement.querySelector('.widget__place__panel');
@@ -75,7 +77,6 @@ var politicalplaces = (function() {
     } else {
       widget.id = widgetDOMElement.getAttribute('data-id');
     }
-
     if (widget.address_input.value !== '') {
       geoCode(widget.address_input.value, widget);
     }
