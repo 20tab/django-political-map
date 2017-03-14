@@ -1,3 +1,7 @@
+document.addEventListener("DOMContentLoaded", function() {
+  politicalplaces.init();
+});
+
 var politicalplaces = (function() {
   'use strict';
 
