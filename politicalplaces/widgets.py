@@ -25,6 +25,7 @@ class PlaceWidget(TextInput):
         js = (
             "admin/js/vendor/jquery/jquery.js",
             "admin/js/jquery.init.js",
+            "politicalplaces/js/main.js",
             "politicalplaces/js/politicalplaces.js",
             ("https://maps.googleapis.com/maps/api/js"
              "?language={}&key={}").format(
