@@ -11,7 +11,7 @@ setup(
     url='https://github.com/20tab/django-political-map.git',
     license='MIT License',
     install_requires=[
-        'googlemaps==2.4.5',
+        'googlemaps==2.4.6',
     ],
     packages=find_packages(),
     include_package_data=True,
