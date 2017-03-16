@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.forms import ModelForm
 from politicalplaces.models import PoliticalPlace, MapItem
-from .models import MyLocation
+from .models import MyLocation, MyLocationComplex
 
 
 class MyLocationTest(TestCase):
@@ -68,3 +68,19 @@ class MyLocationTest(TestCase):
     def test_mylocation_null(self):
         my_location = MyLocation.objects.create()
         self.assertTrue(my_location)
+
+
+class MyLocationComplexTest(TestCase):
+
+    def setUp(self):
+        class MyLocationComplexForm(ModelForm):
+
+            class Meta:
+                model = MyLocationComplex
+                exclude = []
+        self.MyLocationComplexForm = MyLocationComplexForm
+
+    def test_mylocation_complex_form(self):
+        data = {'mandatory_charfield': None, 'place': "Roma"}
+        location_form = self.MyLocationComplexForm(data=data)
+        self.assertFalse(location_form.is_valid())

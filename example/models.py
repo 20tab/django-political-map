@@ -36,3 +36,16 @@ class MyLocationInlinePlace(models.Model):
     place = PlaceField(
         on_delete=models.SET_NULL,
         null=True, blank=True)
+
+
+class MyLocationComplex(models.Model):
+    mandatory_charfield = models.CharField(max_length=200)
+    place = PlaceField(
+        on_delete=models.SET_NULL,
+        null=True, blank=True)
+
+    def __str__(self):
+        return self.__unicode__()
+
+    def __unicode__(self):
+        return str(self.place)

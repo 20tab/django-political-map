@@ -14,7 +14,7 @@ class PlaceChoiceField(ModelChoiceField):
 
     def prepare_value(self, value):
         # TODO is there any way to get address without doing an extra query?
-        if value:
+        if value and isinstance(value, int):
             value = PoliticalPlace.objects.get(pk=value).address
         return super(PlaceChoiceField, self).prepare_value(value)
 
