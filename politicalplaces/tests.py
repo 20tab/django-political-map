@@ -146,19 +146,39 @@ class PoliticalPlaceModelTest(TestCase):
             test_place.continent,
             "Europe")
 
-    def test_political_place_get_or_create_from_address_bug_notypes(self):
+    def test_political_place_get_or_create_from_address_route_street_number(self):
         test_place = PoliticalPlace.get_or_create_from_address(
-            "Largo Arquata del Tronto, 00156 Roma, Italy")
+            "Largo Arquata del Tronto 1, 00156 Roma, Italy")
         test_place.refresh_from_db()
         self.assertEqual(
+            test_place.route,
+            "Via Arquata del Tronto")
+        self.assertEqual(
+            test_place.street_number,
+            "1")
+        self.assertEqual(
             test_place.geo_type,
-            "")
+            "street_address")
         self.assertEqual(
             test_place.types,
-            "")
+            "['street_address']")
         self.assertEqual(
             test_place.country,
             "Italy")
+
+    def test_political_place_get_or_create_from_address_no_country(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            "Gaza")
+        test_place.refresh_from_db()
+        self.assertEqual(
+            test_place.geo_type,
+            "administrative_area_level_1")
+        self.assertEqual(
+            test_place.types,
+            "['administrative_area_level_1', 'political']")
+        self.assertEqual(
+            test_place.country,
+            "")
 
     def test_political_place_get_or_create_from_address_items_creation(self):
         test_place = PoliticalPlace.get_or_create_from_address(

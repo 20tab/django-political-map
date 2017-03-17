@@ -20,6 +20,12 @@ POLITICAL_TYPES = [
     'locality',
     'ward',
     'sublocality',
+    'neighborhood',
+]
+
+DETAIL_TYPES = POLITICAL_TYPES + [
+    'route',
+    'street_number',
 ]
 
 
@@ -128,6 +134,9 @@ class PoliticalPlace(models.Model):
     locality = models.CharField(max_length=255, blank=True)
     ward = models.CharField(max_length=255, blank=True)
     sublocality = models.CharField(max_length=255, blank=True)
+    neighborhood = models.CharField(max_length=255, blank=True)
+    route = models.CharField(max_length=255, blank=True)
+    street_number = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255)
     place_id = models.CharField(unique=True, max_length=255)
     geocode = models.CharField(max_length=255, blank=True)
@@ -174,6 +183,10 @@ class PoliticalPlace(models.Model):
         MapItem, on_delete=models.SET_NULL,
         related_name='politicalplace_sublocality_set',
         null=True, blank=True)
+    neighborhood_item = models.ForeignKey(
+        MapItem, on_delete=models.SET_NULL,
+        related_name='politicalplace_neighborhood_set',
+        null=True, blank=True)
 
     @property
     def lat(self):
@@ -198,33 +211,37 @@ class PoliticalPlace(models.Model):
             return ""
 
     def _create_map_items(self, client, lat, lng):
-        # self already has administrative levels filled
-        # run reverse geocoding
-        reverse_results = client.reverse_geocode((lat, lng))
-        # set url and parent to use in item for cycle
-        url = ''
+        """Create map_items"""
+
+        # list of results from latlng reverse geocoding
+        latlng_results = client.reverse_geocode((lat, lng))
+        # list of actual added components
+        actual_components = [x for x in POLITICAL_TYPES
+                             if getattr(self, x) not in ("", None)]
+        # dict mapping main political type to component object
+        latlng_components = {self._get_main_type(x['types']): x for
+                             x in latlng_results[::-1]}
+        #missing_components = #TODO
         parent = None
-        # first set the continent, usually not a political place
-        if self.continent not in (None, ""):
-            continent_item = MapItem.update_or_create_from_address(
-                self.continent, 'continent')
-            self.continent_item = continent_item
-            url += continent_item.url
-            parent = continent_item
-        # then, for each result
-        for item in reverse_results[::-1]:
-            # if its related field is not empty
-            t = self._get_main_type(item['types'])
+        url = ''
+        for component in actual_components:
             try:
-                if getattr(self, t) not in (None, ""):
-                    # get_or_create map item from place_id
-                    map_item = MapItem.update_or_create_from_place_id(
-                        item['place_id'], url=url, parent=parent)
-                    setattr(self, "{}_item".format(t), map_item)
-                    url = map_item.url
-                    parent = map_item
-            except AttributeError:
-                pass  # type is not political
+                # try to get component object
+                map_component = latlng_components[component]
+            except KeyError:
+                # if it doesn't exist (ex. Continent), try to add it using
+                # the saved string address
+                map_item = MapItem.update_or_create_from_address(
+                    getattr(self, component), component,
+                    url=url, parent=parent)
+            else:
+                # otherwise you can use the place_id, that's better
+                map_item = MapItem.update_or_create_from_place_id(
+                    map_component['place_id'], url=url, parent=parent)
+            # finally set the item element and update url and parent
+            setattr(self, "{}_item".format(component), map_item)
+            url = map_item.url
+            parent = map_item
 
     def refresh_data(self):
         """
@@ -278,12 +295,14 @@ class PoliticalPlace(models.Model):
         self.types = geocode_result['types'] or ""
         self.response_json = json.dumps(geocode_result)
         for component in address_components[::-1]:
-            for t in POLITICAL_TYPES:
+            for t in DETAIL_TYPES:
                 if t in component['types']:
                     setattr(self, t, component['long_name'])
                 elif not getattr(self, t):
                     setattr(self, t, "")
         self.continent = country_to_continent(self.country)
+        if not self.continent:
+            self.continent = ""
         self._create_map_items(client, location['lat'], location['lng'])
         return self
 
@@ -300,11 +319,13 @@ class PoliticalPlace(models.Model):
 
     def link_map_items(self):
         """
-        Use this method when your objects has all the static geograpghic
+        Use this method when your object has all the static geograpghic
         informations filled by frontend
         """
         client = Client()
         self.continent = country_to_continent(self.country)
+        if not self.continent:
+            self.continent = ""
         self._create_map_items(client, self.lat, self.lng)
         self.save()
 
