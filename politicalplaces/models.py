@@ -6,6 +6,7 @@ from .backends import Client
 from .exceptions import (
     NoResultsException, GeoTypeException, ExistingPlaceID)
 from .utils import country_to_continent
+from collections import OrderedDict
 import json
 
 
@@ -213,42 +214,52 @@ class PoliticalPlace(models.Model):
     def _create_map_items(self, client, lat, lng):
         """Create map_items"""
 
+        if self.geo_type and self.geo_type in POLITICAL_TYPES:
+            edge_type = self.geo_type
+        else:
+            edge_type = None
         # list of results from latlng reverse geocoding
         latlng_results = client.reverse_geocode((lat, lng))
-        # list of actual added components
-        actual_components = [x for x in POLITICAL_TYPES
-                             if getattr(self, x) not in ("", None)]
-        # dict mapping main political type to component object
-        latlng_components = {self._get_main_type(x['types']): x for
-                             x in latlng_results[::-1]}
-        #missing_components = #TODO
+        latlng_components = OrderedDict(
+            [(self._get_main_type(x['types']), x) for
+             x in latlng_results[::-1]])
         parent = None
         url = ''
-        for component in actual_components:
+        for component in POLITICAL_TYPES:
             try:
                 # try to get component object
                 map_component = latlng_components[component]
             except KeyError:
                 # if it doesn't exist (ex. Continent), try to add it using
                 # the saved string address
-                map_item = MapItem.update_or_create_from_address(
-                    getattr(self, component), component,
-                    url=url, parent=parent)
+                if getattr(self, component) not in ["", None]:
+                    map_item = MapItem.update_or_create_from_address(
+                        getattr(self, component), component,
+                        url=url, parent=parent)
+                else:
+                    if component == edge_type:
+                        return
+                    continue
             else:
                 # otherwise you can use the place_id, that's better
                 map_item = MapItem.update_or_create_from_place_id(
                     map_component['place_id'], url=url, parent=parent)
+                if getattr(self, component) in ["", None]:
+                    setattr(self, component, map_item.long_name)
+
             # finally set the item element and update url and parent
             setattr(self, "{}_item".format(component), map_item)
+            if component == edge_type:
+                return
             url = map_item.url
             parent = map_item
 
     def refresh_data(self):
         """
         if for any reason your PoliticalPlace object has only address and
-        place_id, or you need to refres geographic data from the source app
+        place_id, or you need to refresh geographic data from the source app
         (googlemaps, etc.), you can perform this action.
-        This will work even with just address (python object not already
+        This will work even only with the address (python object not already
         db object)
         """
         if self.place_id:

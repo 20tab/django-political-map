@@ -94,6 +94,7 @@ class PoliticalPlaceModelTest(TestCase):
         self.test_place.continent = 'Europe'
         self.test_place.country = 'Italy'
         self.test_place.administrative_area_level_1 = 'Lazio'
+        self.test_place.geo_type = 'administrative_area_level_1'
         client = Client()
         lat = '41.6552418'
         lng = '12.989615'
@@ -165,6 +166,26 @@ class PoliticalPlaceModelTest(TestCase):
         self.assertEqual(
             test_place.country,
             "Italy")
+
+    def test_political_place_get_or_create_from_address_neighborhood(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            "via Luigi Gastinelli 118, Rome")
+        test_place.refresh_from_db()
+        self.assertEqual(
+            test_place.administrative_area_level_4,
+            "")
+        self.assertEqual(
+            test_place.neighborhood,
+            "Zona IX Acqua Vergine")
+        self.assertEqual(
+            test_place.route,
+            "Via Luigi Gastinelli")
+        self.assertEqual(
+            test_place.street_number,
+            "118")
+        self.assertEqual(
+            test_place.geo_type,
+            "street_address")
 
     def test_political_place_get_or_create_from_address_no_country(self):
         test_place = PoliticalPlace.get_or_create_from_address(
