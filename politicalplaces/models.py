@@ -27,6 +27,7 @@ POLITICAL_TYPES = [
 DETAIL_TYPES = POLITICAL_TYPES + [
     'route',
     'street_number',
+    'postal_code',
 ]
 
 
@@ -138,6 +139,7 @@ class PoliticalPlace(models.Model):
     neighborhood = models.CharField(max_length=255, blank=True)
     route = models.CharField(max_length=255, blank=True)
     street_number = models.CharField(max_length=255, blank=True)
+    postal_code = models.CharField(max_length=255, blank=True)
     address = models.CharField(max_length=255)
     place_id = models.CharField(unique=True, max_length=255)
     geocode = models.CharField(max_length=255, blank=True)
