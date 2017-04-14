@@ -107,6 +107,35 @@ class MapItem(models.Model):
     def relative_url(self):
         return "{}/{}".format(self.url, self.pk)
 
+    def _get_json_attribute(self, nodes):
+        try:
+            source = json.loads(self.response_json)
+        except (ValueError, KeyError):
+            return None
+        else:
+            node = source
+            try:
+                for n in nodes:
+                    node = node[n]
+            except KeyError:
+                return None
+            else:
+                return node
+
+    def geometry_bounds(self, json_output=True):
+        bounds = self._get_json_attribute(['geometry', 'bounds'])
+        if json_output:
+            return json.dumps(bounds)
+        else:
+            return bounds
+
+    def geometry_viewport(self, json_output=True):
+        viewport = self._get_json_attribute(['geometry', 'viewport'])
+        if json_output:
+            return json.dumps(viewport)
+        else:
+            return viewport
+
     def __str__(self):
         return "{}({})".format(self.long_name, self.geo_type)
 

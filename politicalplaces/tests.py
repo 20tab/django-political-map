@@ -9,6 +9,8 @@ from .widgets import PlaceWidget
 #from .forms import PoliticalPlaceForm
 from googlemaps.exceptions import HTTPError
 
+import json
+
 
 class PlaceWidgetTest(TestCase):
     maxDiff = None
@@ -394,3 +396,33 @@ class MapItemModelTest(TestCase):
         self.assertEqual(
             map_item.place_id,
             'ChIJHdCfu0S2k3ERqeJexcrMbfM')
+
+    def test_geometry_properties(self):
+        address = "Thailandia"
+        map_item = MapItem.update_or_create_from_address(
+            address, 'country')
+        self.assertEqual(map_item.long_name, "Thailand")
+        self.assertEqual(map_item.short_name, "TH")
+        self.assertEqual(map_item.geocode, "15.870032,100.992541")
+        self.assertEqual(
+            map_item.place_id, 'ChIJsU1CR_eNTTARAuhXB4gs154')
+        self.assertEqual(
+            map_item.geometry_bounds(False), {
+                'northeast': {'lat': 20.465143, 'lng': 105.636812},
+                'southwest': {'lat': 5.613038, 'lng': 97.343396}
+            })
+        self.assertEqual(
+            json.loads(map_item.geometry_bounds()), {
+                'northeast': {'lat': 20.465143, 'lng': 105.636812},
+                'southwest': {'lat': 5.613038, 'lng': 97.343396}
+            })
+        self.assertEqual(
+            map_item.geometry_viewport(False), {
+                'northeast': {'lat': 20.4643551, 'lng': 105.6353682},
+                'southwest': {'lat': 5.6135541, 'lng': 97.3449049}
+            })
+        self.assertEqual(
+            json.loads(map_item.geometry_viewport()), {
+                'northeast': {'lat': 20.4643551, 'lng': 105.6353682},
+                'southwest': {'lat': 5.6135541, 'lng': 97.3449049}
+            })
