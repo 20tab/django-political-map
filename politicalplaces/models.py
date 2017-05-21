@@ -30,6 +30,15 @@ DETAIL_TYPES = POLITICAL_TYPES + [
     'postal_code',
 ]
 
+def _get_main_type(types):
+    for t in POLITICAL_TYPES:
+        if t in types:
+            return t
+    try:
+        return types[0]
+    except IndexError:
+        return ""
+
 
 class MapItem(models.Model):
     place_id = models.CharField(unique=True, max_length=255)
@@ -54,7 +63,7 @@ class MapItem(models.Model):
             defaults={
                 'long_name': address_components['long_name'],
                 'short_name': address_components['short_name'],
-                'geo_type': types_list[0],
+                'geo_type': _get_main_type(types_list),
                 'types': ",".join(types_list),
                 'response_json': json.dumps(geocode_result),
                 'geocode': "{},{}".format(location['lat'], location['lng']),
@@ -65,7 +74,8 @@ class MapItem(models.Model):
         return mapitem
 
     @classmethod
-    def update_or_create_from_place_id(cls, place_id, url='', parent=None):
+    def update_or_create_from_place_id(
+            cls, place_id, expected_type=None, url='', parent=None):
         """
         geocodes provided place_id and builds the url adding the slug.
         All returned types are stored as comma separated slugs in
@@ -77,10 +87,13 @@ class MapItem(models.Model):
         # choose between different solutions, like in the frontend form
         geocode_result = geocode_result[0]
         types_list = geocode_result['types']
+        #if expected_type and expected_type not in types_list:
+        #    types_list.append(expected_type)
         return cls._update_or_create_item(geocode_result, types_list, url, parent)
 
     @classmethod
-    def update_or_create_from_address(cls, address, geo_type, url='', parent=None):
+    def update_or_create_from_address(
+            cls, address, geo_type, url='', parent=None):
         """
         geocodes provided address, checks if attended geo_type is
         in results and builds the url adding the slug.
@@ -232,16 +245,6 @@ class PoliticalPlace(models.Model):
             return self.geocode.split(",")[1]
         return None
 
-    @staticmethod
-    def _get_main_type(types):
-        for t in POLITICAL_TYPES:
-            if t in types:
-                return t
-        try:
-            return types[0]
-        except IndexError:
-            return ""
-
     def _create_map_items(self, client, lat, lng):
         """Create map_items"""
 
@@ -252,7 +255,7 @@ class PoliticalPlace(models.Model):
         # list of results from latlng reverse geocoding
         latlng_results = client.reverse_geocode((lat, lng))
         latlng_components = OrderedDict(
-            [(self._get_main_type(x['types']), x) for
+            [(_get_main_type(x['types']), x) for
              x in latlng_results[::-1]])
         parent = None
         url = ''
@@ -274,7 +277,8 @@ class PoliticalPlace(models.Model):
             else:
                 # otherwise you can use the place_id, that's better
                 map_item = MapItem.update_or_create_from_place_id(
-                    map_component['place_id'], url=url, parent=parent)
+                    map_component['place_id'], expected_type=component,
+                    url=url, parent=parent)
                 if getattr(self, component) in ["", None]:
                     setattr(self, component, map_item.long_name)
 
@@ -333,7 +337,7 @@ class PoliticalPlace(models.Model):
                         self.place_id))
             return existing_item
         self.geocode = "{},{}".format(location['lat'], location['lng'])
-        self.geo_type = self._get_main_type(geocode_result['types'])
+        self.geo_type = _get_main_type(geocode_result['types'])
         self.types = geocode_result['types'] or ""
         self.response_json = json.dumps(geocode_result)
         for component in address_components[::-1]:

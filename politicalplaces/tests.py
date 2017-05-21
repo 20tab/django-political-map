@@ -79,7 +79,7 @@ class PoliticalPlaceModelTest(TestCase):
         self.test_place = PoliticalPlace(
             address=self.address)
         self.test_place_wrong_addr = PoliticalPlace(
-            address="qwertyuiop")
+            address="kkkkkkkkkkkkkkkkkkkkkkkkkkkk")
 
     def test_unicode_str(self):
         test_place = PoliticalPlace.get_or_create_from_address(
@@ -247,6 +247,28 @@ class PoliticalPlaceModelTest(TestCase):
             PoliticalPlace.get_or_create_from_address(
                 self.test_place_wrong_addr.address)
 
+    def test_political_place_get_or_create_from_address_wrong_type(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            "Colosseo, Rome")
+        map_item_italy = MapItem.objects.get(
+            long_name__iexact='Italy',
+            geo_type__iexact='country')
+        map_item_lazio = MapItem.objects.get(
+            long_name__iexact='Lazio',
+            geo_type__iexact='administrative_area_level_1')
+        map_item_rome_area3 = MapItem.objects.get(
+            long_name__icontains='Rome',
+            geo_type__iexact='administrative_area_level_3')
+        map_item_roma = MapItem.objects.get(
+            long_name__iexact='Rome',
+            geo_type__iexact='locality')
+        map_item_roma = MapItem.objects.get(
+            long_name__iexact='Municipio I',
+            geo_type__iexact='sublocality')
+        map_item_roma = MapItem.objects.get(
+            long_name__iexact='Rione XIX Celio',
+            geo_type__iexact='neighborhood')
+
     def test_political_place_link_map_items(self):
         self.test_place.geocode = "41.6552418,12.989615"
         self.test_place.place_id = ""
@@ -322,7 +344,7 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_address_error(self):
         address = "qwertyuiop"
-        with self.assertRaises(NoResultsException):
+        with self.assertRaises(GeoTypeException):
             MapItem.update_or_create_from_address(
                 address, 'administrative_area_level_1')
 
