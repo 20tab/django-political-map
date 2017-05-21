@@ -58,6 +58,8 @@ class MapItem(models.Model):
         address_components = geocode_result['address_components'][0]
         location = geocode_result['geometry']['location']
         slug = slugify(address_components['short_name'])
+        if slug == "":
+            slug = slugify(address_components['long_name'])
         mapitem, created = cls.objects.update_or_create(
             place_id=geocode_result['place_id'],
             defaults={
