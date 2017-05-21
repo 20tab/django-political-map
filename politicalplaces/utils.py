@@ -568,7 +568,7 @@ CONTINENT_COUNTRIES = (
         ('GY', _('Guyana')),
         ('MQ', _('Martinique')),
         ('PY', _('Paraguay')),
-        ('PE', _('Per')),
+        ('PE', _('Peru')),
         ('GS', _('South Georgia and the South Sandwich Islands')),
         ('SR', _('Suriname')),
         ('UY', _('Uruguay')),

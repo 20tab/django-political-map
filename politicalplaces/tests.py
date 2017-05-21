@@ -149,6 +149,19 @@ class PoliticalPlaceModelTest(TestCase):
             test_place.continent,
             "Europe")
 
+    def test_political_place_get_or_create_from_address_fields_creation3(self):
+        test_place = PoliticalPlace.get_or_create_from_address(
+            "Av de la Cultura, Cusco, Peru")
+        self.assertEqual(
+            test_place.locality,
+            "Cusco")
+        self.assertEqual(
+            test_place.country,
+            "Peru")
+        self.assertEqual(
+            test_place.continent,
+            "South America")
+
     def test_political_place_get_or_create_from_address_route_street_number(self):
         test_place = PoliticalPlace.get_or_create_from_address(
             "Largo Arquata del Tronto 1, 00156 Roma, Italy")
