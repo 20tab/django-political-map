@@ -30,6 +30,7 @@ DETAIL_TYPES = POLITICAL_TYPES + [
     'postal_code',
 ]
 
+
 def _get_main_type(types):
     for t in POLITICAL_TYPES:
         if t in types:
@@ -50,6 +51,7 @@ class MapItem(models.Model):
     geocode = models.CharField(max_length=255)
     slug = models.SlugField()
     url = models.CharField(max_length=255, blank=True)
+    political = models.BooleanField(default=False)
     parent = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL)
 
@@ -71,6 +73,7 @@ class MapItem(models.Model):
                 'geocode': "{},{}".format(location['lat'], location['lng']),
                 'slug': slug,
                 'url': "{}/{}".format(url, slug),
+                #'political': 'political' in types_list,
                 'parent': parent,
             })
         return mapitem

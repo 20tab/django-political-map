@@ -260,27 +260,18 @@ class PoliticalPlaceModelTest(TestCase):
             PoliticalPlace.get_or_create_from_address(
                 self.test_place_wrong_addr.address)
 
-    def test_political_place_get_or_create_from_address_wrong_type(self):
-        test_place = PoliticalPlace.get_or_create_from_address(
+    def test_political_place_get_or_create_from_address_self_item(self):
+        colosseo = PoliticalPlace.get_or_create_from_address(
             "Colosseo, Rome")
-        map_item_italy = MapItem.objects.get(
-            long_name__iexact='Italy',
-            geo_type__iexact='country')
-        map_item_lazio = MapItem.objects.get(
-            long_name__iexact='Lazio',
-            geo_type__iexact='administrative_area_level_1')
-        map_item_rome_area3 = MapItem.objects.get(
-            long_name__icontains='Rome',
-            geo_type__iexact='administrative_area_level_3')
-        map_item_roma = MapItem.objects.get(
-            long_name__iexact='Rome',
-            geo_type__iexact='locality')
-        map_item_roma = MapItem.objects.get(
-            long_name__iexact='Municipio I',
-            geo_type__iexact='sublocality')
-        map_item_roma = MapItem.objects.get(
-            long_name__iexact='Rione XIX Celio',
-            geo_type__iexact='neighborhood')
+        self.assertEqual(colosseo.country_item.short_name, "IT")
+        self.assertEqual(colosseo.route, "Piazza del Colosseo")
+        self.assertEqual(colosseo.street_number, "1")
+        self.assertEqual(colosseo.administrative_area_level_2_item.short_name, "RM")
+        self.assertEqual(colosseo.sublocality_item.short_name, "Municipio I")
+        self.assertEqual(
+            colosseo.self_item.short_name,
+            "Piazza del Colosseo, 1, 00184 Roma, Italy")
+        self.assertFalse(colosseo.self_item.political)
 
     def test_political_place_link_map_items(self):
         self.test_place.geocode = "41.6552418,12.989615"
@@ -357,7 +348,7 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_address_error(self):
         address = "qwertyuiop"
-        with self.assertRaises(GeoTypeException):
+        with self.assertRaises(NoResultsException):
             MapItem.update_or_create_from_address(
                 address, 'administrative_area_level_1')
 
@@ -378,7 +369,7 @@ class MapItemModelTest(TestCase):
         self.assertEqual(2, MapItem.objects.count())
 
     def test_get_or_create_from_address_africa(self):
-        address = "Kayuma"
+        address = "Kayuma, CD"
         map_item = MapItem.update_or_create_from_address(
             address, 'locality')
         self.assertEqual(map_item.long_name, "Kayuma")
