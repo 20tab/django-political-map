@@ -27,8 +27,11 @@ class MyLocationTest(TestCase):
         self.assertEqual(
             loc.place.country_item.short_name,
             "IT")
+        self.assertEqual(
+            loc.place.self_item.geo_type,
+            "route")
         self.assertEqual(1, PoliticalPlace.objects.count())
-        self.assertEqual(7, MapItem.objects.count())
+        self.assertEqual(8, MapItem.objects.count())
         self.assertEqual(1, MyLocation.objects.count())
         loc2 = MyLocation()
         loc2.name = "Test Location 2"
@@ -40,7 +43,7 @@ class MyLocationTest(TestCase):
             loc2.place.country_item.short_name,
             "IT")
         self.assertEqual(1, PoliticalPlace.objects.count())
-        self.assertEqual(7, MapItem.objects.count())
+        self.assertEqual(8, MapItem.objects.count())
         self.assertEqual(2, MyLocation.objects.count())
 
     def test_mylocation_formfield_clean(self):

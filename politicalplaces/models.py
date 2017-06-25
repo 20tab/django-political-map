@@ -51,7 +51,6 @@ class MapItem(models.Model):
     geocode = models.CharField(max_length=255)
     slug = models.SlugField()
     url = models.CharField(max_length=255, blank=True)
-    political = models.BooleanField(default=False)
     parent = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL)
 
@@ -62,7 +61,7 @@ class MapItem(models.Model):
         slug = slugify(address_components['short_name'])
         if slug == "":
             slug = slugify(address_components['long_name'])
-        mapitem, created = cls.objects.update_or_create(
+        mapitem, _ = cls.objects.update_or_create(
             place_id=geocode_result['place_id'],
             defaults={
                 'long_name': address_components['long_name'],
@@ -73,7 +72,26 @@ class MapItem(models.Model):
                 'geocode': "{},{}".format(location['lat'], location['lng']),
                 'slug': slug,
                 'url': "{}/{}".format(url, slug),
-                #'political': 'political' in types_list,
+                'parent': parent,
+            })
+        return mapitem
+
+    @classmethod
+    def update_or_create_from_political_place(
+            cls, place_id, name, geo_type, types, response_json,
+            geocode, url, parent):
+        slug = slugify(name)
+        mapitem, _ = cls.objects.update_or_create(
+            place_id=place_id,
+            defaults={
+                'long_name': name,
+                'short_name': name,
+                'geo_type': geo_type,
+                'types': types,
+                'response_json': response_json,
+                'geocode': geocode,
+                'slug': slug,
+                'url': "{}/{}".format(url, slug),
                 'parent': parent,
             })
         return mapitem
@@ -237,6 +255,10 @@ class PoliticalPlace(models.Model):
         MapItem, on_delete=models.SET_NULL,
         related_name='politicalplace_neighborhood_set',
         null=True, blank=True)
+    self_item = models.ForeignKey(
+        MapItem, on_delete=models.SET_NULL,
+        related_name='politicalplace_self_set',
+        null=True, blank=True)
 
     @property
     def lat(self):
@@ -293,6 +315,10 @@ class PoliticalPlace(models.Model):
                 return
             url = map_item.url
             parent = map_item
+        if 'political' not in self.types:
+            self.self_item = MapItem.update_or_create_from_political_place(
+                self.place_id, self.address, self.geo_type, self.types,
+                self.response_json, self.geocode, url, parent)
 
     def refresh_data(self):
         """

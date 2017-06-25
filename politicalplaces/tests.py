@@ -271,7 +271,6 @@ class PoliticalPlaceModelTest(TestCase):
         self.assertEqual(
             colosseo.self_item.short_name,
             "Piazza del Colosseo, 1, 00184 Roma, Italy")
-        self.assertFalse(colosseo.self_item.political)
 
     def test_political_place_link_map_items(self):
         self.test_place.geocode = "41.6552418,12.989615"
