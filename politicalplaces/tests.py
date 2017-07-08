@@ -272,6 +272,27 @@ class PoliticalPlaceModelTest(TestCase):
             colosseo.self_item.short_name,
             "Piazza del Colosseo, 1, 00184 Roma, Italy")
 
+    def test_political_place_get_or_create_from_address_gmaps_bug_roviano(self):
+        """ Gmaps latlng only returns the street address result, missing all the
+        other components."""
+        test_place = PoliticalPlace.get_or_create_from_address(
+            "Piazza della Repubblica, 00027 Roviano RM")
+        self.assertEqual(
+            test_place.locality,
+            "Roviano")
+        self.assertEqual(
+            test_place.locality_item.error_log,
+            "Geographical type locality not found in results ['administrative_area_level_3', 'political']")
+        self.assertEqual(
+            test_place.country,
+            "Italy")
+        self.assertEqual(
+            test_place.country_item.error_log,
+            "")
+        self.assertEqual(
+            test_place.continent,
+            "Europe")
+
     def test_political_place_link_map_items(self):
         self.test_place.geocode = "41.6552418,12.989615"
         self.test_place.place_id = ""
@@ -353,9 +374,15 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_address_wrong_geo_type(self):
         address = "Lazio, Italy"
-        with self.assertRaises(GeoTypeException):
-            MapItem.update_or_create_from_address(
-                address, 'country')
+        #with self.assertRaises(GeoTypeException):
+        #    MapItem.update_or_create_from_address(
+        #        address, 'country')
+        map_item = MapItem.update_or_create_from_address(
+            address, 'country')
+        self.assertEqual(
+            map_item.error_log,
+            "Geographical type country not found in results ['administrative_area_level_1', 'political']"
+        )
 
     def test_get_or_create_from_address_get(self):
         self.assertEqual(1, MapItem.objects.count())

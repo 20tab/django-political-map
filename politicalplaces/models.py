@@ -4,7 +4,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from .backends import Client
 from .exceptions import (
-    NoResultsException, GeoTypeException, ExistingPlaceID)
+    NoResultsException, ExistingPlaceID)  # GeoTypeException,
 from .utils import country_to_continent
 from collections import OrderedDict
 import json
@@ -53,9 +53,11 @@ class MapItem(models.Model):
     url = models.CharField(max_length=255, blank=True)
     parent = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL)
+    error_log = models.TextField(blank=True)
 
     @classmethod
-    def _update_or_create_item(cls, geocode_result, types_list, url, parent):
+    def _update_or_create_item(
+            cls, geocode_result, types_list, url, parent, error_log=""):
         address_components = geocode_result['address_components'][0]
         location = geocode_result['geometry']['location']
         slug = slugify(address_components['short_name'])
@@ -73,13 +75,14 @@ class MapItem(models.Model):
                 'slug': slug,
                 'url': "{}/{}".format(url, slug),
                 'parent': parent,
+                'error_log': error_log,
             })
         return mapitem
 
     @classmethod
     def update_or_create_from_political_place(
             cls, place_id, name, geo_type, types, response_json,
-            geocode, url, parent):
+            geocode, url, parent, error_log=""):
         slug = slugify(name)
         mapitem, _ = cls.objects.update_or_create(
             place_id=place_id,
@@ -93,6 +96,7 @@ class MapItem(models.Model):
                 'slug': slug,
                 'url': "{}/{}".format(url, slug),
                 'parent': parent,
+                'error_log': error_log,
             })
         return mapitem
 
@@ -133,11 +137,15 @@ class MapItem(models.Model):
         # choose between different solutions, like in the frontend form
         geocode_result = geocode_result[0]
         types_list = geocode_result['address_components'][0]['types']
+        error_log = ""
         if geo_type not in types_list:
-            raise GeoTypeException(
-                "Geographical type {} not found in results {}".format(
-                    geo_type, types_list))
-        return cls._update_or_create_item(geocode_result, types_list, url, parent)
+            error_log = "Geographical type {} not found in results {}".format(
+                geo_type, types_list)
+            #raise GeoTypeException(
+            #    "Geographical type {} not found in results {}".format(
+            #        geo_type, types_list))
+        return cls._update_or_create_item(
+            geocode_result, types_list, url, parent, error_log)
 
     @property
     def relative_url(self):
