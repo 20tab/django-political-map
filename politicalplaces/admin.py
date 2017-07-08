@@ -23,17 +23,18 @@ class PoliticalPlaceAdmin(admin.ModelAdmin):
         'continent_item', 'country_item', 'administrative_area_level_1_item',
         'administrative_area_level_2_item', 'administrative_area_level_3_item',
         'administrative_area_level_4_item', 'administrative_area_level_5_item',
-        'locality_item', 'ward_item', 'sublocality_item', 'neighborhood_item')
+        'locality_item', 'ward_item', 'sublocality_item', 'neighborhood_item',
+        'self_item')
 
 
 class MapItemAdmin(admin.ModelAdmin):
     list_display = (
-        'long_name', 'short_name', 'place_id',
-        'geo_type', 'geocode', 'slug', 'relative_url', 'parent')
+        'long_name', 'short_name', 'place_id', 'geo_type', 'geocode',
+        'slug', 'relative_url', 'parent', 'error_log')
     list_filter = ('geo_type',)
     search_fields = (
         'place_id', 'long_name', 'short_name',
-        'geo_type', 'geocode', 'slug', 'url')
+        'geo_type', 'geocode', 'slug', 'url', 'error_log')
     ordering = ('geo_type', 'long_name')
     raw_id_fields = ('parent',)
 
