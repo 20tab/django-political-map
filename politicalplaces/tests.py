@@ -4,7 +4,7 @@ from django.test import TestCase, override_settings
 from .models import PoliticalPlace, MapItem
 from .utils import country_to_continent
 from .backends import Client
-from .exceptions import GeoTypeException, NoResultsException
+from .exceptions import NoResultsException  # GeoTypeException
 from .widgets import PlaceWidget
 #from .forms import PoliticalPlaceForm
 from googlemaps.exceptions import HTTPError
