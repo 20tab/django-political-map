@@ -43,7 +43,9 @@ var politicalplaces = (function() {
   }
   
   function onFormsetAdded(evt, row, formset_name) {
-    addNewWidget(row[0].querySelector('.widget'), formset_name);
+    if (row[0].querySelector('.widget')) {
+      addNewWidget(row[0].querySelector('.widget'), formset_name);
+    }
   }
 
   function onInputKeyDown(evt) {
