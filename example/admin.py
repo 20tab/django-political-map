@@ -2,11 +2,15 @@ from django.contrib import admin
 from .models import (
     MyLocation, MyLocationMultiPlace,
     MyLocationInlineTest, MyLocationInlinePlace,
-    MyLocationComplex)
+    MyLocationInlineNotPlace, MyLocationComplex)
 
 
-class MyLocationInlinePlace(admin.TabularInline):
+class MyLocationInlinePlaceAdmin(admin.TabularInline):
     model = MyLocationInlinePlace
+
+
+class MyLocationInlineNotPlaceAdmin(admin.TabularInline):
+    model = MyLocationInlineNotPlace
 
 
 class MyLocationAdmin(admin.ModelAdmin):
@@ -26,7 +30,7 @@ class MyLocationMultiPlaceAdmin(admin.ModelAdmin):
 
 class MyLocationInlineAdmin(MyLocationAdmin):
 
-    inlines = [MyLocationInlinePlace]
+    inlines = [MyLocationInlinePlaceAdmin, MyLocationInlineNotPlaceAdmin]
 
 
 admin.site.register(MyLocation, MyLocationAdmin)

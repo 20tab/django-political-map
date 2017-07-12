@@ -38,6 +38,11 @@ class MyLocationInlinePlace(models.Model):
         null=True, blank=True)
 
 
+class MyLocationInlineNotPlace(models.Model):
+    parent_location = models.ForeignKey(MyLocation)
+    name = models.CharField(max_length=100, blank=True)
+
+
 class MyLocationComplex(models.Model):
     mandatory_charfield = models.CharField(max_length=200)
     place = PlaceField(
