@@ -12,7 +12,7 @@ var politicalplaces = (function() {
   };
 
   function init() {
-    var widgetsDOMElements = document.querySelectorAll('.widget');
+    var widgetsDOMElements = document.querySelectorAll('.politicalplace-widget');
     for (var i = widgetsDOMElements.length - 1; i >= 0; i--) {
       addNewWidget(widgetsDOMElements[i]);
     }
@@ -43,8 +43,8 @@ var politicalplaces = (function() {
   }
   
   function onFormsetAdded(evt, row, formset_name) {
-    if (row[0].querySelector('.widget')) {
-      addNewWidget(row[0].querySelector('.widget'), formset_name);
+    if (row[0].querySelector('.politicalplace-widget')) {
+      addNewWidget(row[0].querySelector('.politicalplace-widget'), formset_name);
     }
   }
 
