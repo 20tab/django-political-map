@@ -61,7 +61,7 @@ class MyLocationTest(TestCase):
         location_form = self.MyLocationForm(instance=location)
         self.assertEqual(
             location_form['place'].value(),
-            "Via Luigi Gastinelli, 00132 Roma, Italy")
+            "Via Luigi Gastinelli, 00132 Roma RM, Italy")
 
     def test_mylocation_formfield_prepare_value_no_instance(self):
         location_form = self.MyLocationForm()

@@ -30,7 +30,7 @@ class PlaceWidgetTest(TestCase):
         self.assertHTMLEqual(
             str(self.placewidget.render(
                 'myfield', 'myvalue', attrs={'id': 'idtest'})),
-            """<div class="widget" data-id="idtest" data-name="myfield">
+            """<div class="politicalplace-widget widget" data-id="idtest" data-name="myfield">
             <input id='idtest' name="myfield" type="text" value="myvalue" />
             <a class='widget__search button' id="search_map_idtest">Search</a>
 <div class="widget__place">
@@ -52,7 +52,7 @@ class BackendTest(TestCase):
         client = Client()
         res = client.geocode("Roma, IT")
         self.assertEqual(
-            "Rome, Italy",
+            "Rome, Metropolitan City of Rome, Italy",
             res[0]['formatted_address'])
 
 
@@ -270,7 +270,7 @@ class PoliticalPlaceModelTest(TestCase):
         self.assertEqual(colosseo.sublocality_item.short_name, "Municipio I")
         self.assertEqual(
             colosseo.self_item.short_name,
-            "Piazza del Colosseo, 1, 00184 Roma, Italy")
+            "Piazza del Colosseo, 1, 00184 Roma RM, Italy")
 
     def test_political_place_get_or_create_from_address_gmaps_bug_roviano(self):
         """ Gmaps latlng only returns the street address result, missing all the

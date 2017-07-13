@@ -10,6 +10,8 @@ omit =  manage.py
         djangopoliticalmap/wsgi.py
         djangopoliticalmap/urls.py
         example/apps.py
+        example/*
+        setup.py
         
 [html]
 directory = coverage
