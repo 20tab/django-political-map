@@ -14,6 +14,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write("Refresh data started.")
+        count = 0
+        errors = 0
         if options['place_id'] != 0:
             all_places = PoliticalPlace.objects.filter(pk__in=options['place_id'])
         else:
@@ -27,6 +29,7 @@ class Command(BaseCommand):
             try:
                 place.refresh_data()
             except NoResultsException as e:
+                errors += 1
                 if options['verbosity'] != 0:
                     self.stdout.write(
                         "PoliticalPlace: {} - {}: {}".format(
@@ -34,4 +37,9 @@ class Command(BaseCommand):
                         ))
                 else:
                     self.stdout.write(e)
-        self.stdout.write("Refresh data completed successfully.")
+            else:
+                count += 1
+        self.stdout.write(
+            "Refresh data completed successfully for {} items, {} errors.".format(
+                count, errors)
+        )
