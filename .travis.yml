@@ -2,3 +2,5 @@ language: python
 python:
     - 3.6
 script: python manage.py test
+notifications:
+     slack: 20tab:mnx0ViMEi5IlYWl9AO4Kt9lm
