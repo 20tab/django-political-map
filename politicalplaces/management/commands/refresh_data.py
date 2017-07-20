@@ -36,7 +36,7 @@ class Command(BaseCommand):
                             place.pk, place.address, e
                         ))
                 else:
-                    self.stdout.write(e)
+                    self.stdout.write("{}".format(e))
             else:
                 count += 1
         self.stdout.write(
