@@ -1,0 +1,9 @@
+certifi==2017.4.17
+chardet==3.0.4
+coverage==4.4.1
+Django==1.11.3
+googlemaps==2.5.1
+idna==2.5
+pytz==2017.2
+requests==2.18.1
+urllib3==1.21.1
