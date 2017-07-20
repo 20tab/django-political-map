@@ -27,8 +27,11 @@ class Command(BaseCommand):
             try:
                 place.refresh_data()
             except NoResultsException as e:
-                self.stdout.write(
-                    "PoliticalPlace: {} - {}: {}".format(
-                        place.pk, place.address, e
-                    ))
+                if options['verbosity'] != 0:
+                    self.stdout.write(
+                        "PoliticalPlace: {} - {}: {}".format(
+                            place.pk, place.address, e
+                        ))
+                else:
+                    self.stdout.write(e)
         self.stdout.write("Refresh data completed successfully.")
