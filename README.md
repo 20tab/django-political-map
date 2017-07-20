@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/20tab/django-political-map.svg?branch=master)](https://travis-ci.org/20tab/django-political-map)
+
 Django Political Map
 ====================
 
