@@ -70,6 +70,31 @@ loc.place = place
 loc.save()
 ```
 
+Refresh Data (django command)
+-----------------------------
+```
+(django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data 2
+Refresh data started.
+Refreshing data for PoliticalPlace: 2 - Brisbane QLD, Australia
+Refresh data completed successfully.
+(django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data 2 3 4
+Refresh data started.
+Refreshing data for PoliticalPlace: 2 - Brisbane QLD, Australia
+Refreshing data for PoliticalPlace: 3 - Via Luigi Gastinelli, 118, 00132 Roma RM, Italy
+Refreshing data for PoliticalPlace: 4 - US-3, United States
+Refresh data completed successfully.
+(django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data 2 3 4 -v 0
+Refresh data started.
+Refresh data completed successfully.
+(django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data
+Refresh data started.
+Refreshing data for PoliticalPlace: 2 - Brisbane QLD, Australia
+Refreshing data for PoliticalPlace: 3 - Via Luigi Gastinelli, 118, 00132 Roma RM, Italy
+[...]
+Refreshing data for PoliticalPlace: 28 - Čerpadlová 572/5, Vysočany, 190 00 Praha-Praha 9, Czechia
+Refresh data completed successfully.
+```
+
 Javascript Initialization
 --------------------------
 Django Political Map has full support for admin change_form with
