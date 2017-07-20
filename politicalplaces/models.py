@@ -49,7 +49,7 @@ class MapItem(models.Model):
     types = models.CharField(max_length=255)
     response_json = models.TextField()
     geocode = models.CharField(max_length=255)
-    slug = models.SlugField()
+    slug = models.SlugField(max_length=200)
     url = models.CharField(max_length=255, blank=True)
     parent = models.ForeignKey(
         'self', blank=True, null=True, on_delete=models.SET_NULL)
@@ -60,9 +60,9 @@ class MapItem(models.Model):
             cls, geocode_result, types_list, url, parent, error_log=""):
         address_components = geocode_result['address_components'][0]
         location = geocode_result['geometry']['location']
-        slug = slugify(address_components['short_name'])
+        slug = slugify(address_components['short_name'])[:200]
         if slug == "":
-            slug = slugify(address_components['long_name'])
+            slug = slugify(address_components['long_name'])[:200]
         mapitem, _ = cls.objects.update_or_create(
             place_id=geocode_result['place_id'],
             defaults={
@@ -83,7 +83,7 @@ class MapItem(models.Model):
     def update_or_create_from_political_place(
             cls, place_id, name, geo_type, types, response_json,
             geocode, url, parent, error_log=""):
-        slug = slugify(name)
+        slug = slugify(name)[:200]
         mapitem, _ = cls.objects.update_or_create(
             place_id=place_id,
             defaults={
