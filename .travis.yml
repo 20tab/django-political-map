@@ -1,4 +1,4 @@
 language: python
-rvm:
+python:
     - 3.6
 script: python manage.py test
