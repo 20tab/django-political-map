@@ -37,6 +37,15 @@ class Command(BaseCommand):
                         ))
                 else:
                     self.stdout.write("PoliticalPlace {}: {}".format(place.pk, e))
+            except Exception as e:
+                errors += 1
+                if options['verbosity'] != 0:
+                    self.stdout.write(
+                        "PoliticalPlace: {} - {}: {}".format(
+                            place.pk, place.address, e
+                        ))
+                else:
+                    self.stdout.write("PoliticalPlace {}: {}".format(place.pk, e))
             else:
                 count += 1
         self.stdout.write(
