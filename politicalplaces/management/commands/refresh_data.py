@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             'place_id', nargs='*', type=int, default=0,
-            help='The id list, separeted by space, of the involved PoliticalPlace objects.')
+            help='The id list, separated by space, of the involved PoliticalPlace objects.')
 
     def handle(self, *args, **options):
         self.stdout.write("Refresh data started.")

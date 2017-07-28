@@ -41,7 +41,7 @@ GOOGLE_API_KEY = "xxxxxxxxxxxxxxxx"
 
 How to
 ------
-There is one only entry point to the app, that is the **Placefield**
+There is one only entry point to the app, that is the **Placefield**.
 This field is a Foreign Key to PoliticalPlace, so you should use it 
 this way:
 ```python
@@ -75,19 +75,50 @@ loc.save()
 Refresh Data (django command)
 -----------------------------
 ```
+(django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data --help
+usage: manage.py refresh_data [-h] [--version] [-v {0,1,2,3}]
+                              [--settings SETTINGS] [--pythonpath PYTHONPATH]
+                              [--traceback] [--no-color]
+                              [place_id [place_id ...]]
+
+Refresh map data calling the external api
+
+positional arguments:
+  place_id              The id list, separeted by space, of the involved
+                        PoliticalPlace objects.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  -v {0,1,2,3}, --verbosity {0,1,2,3}
+                        Verbosity level; 0=minimal output, 1=normal output,
+                        2=verbose output, 3=very verbose output
+  --settings SETTINGS   The Python path to a settings module, e.g.
+                        "myproject.settings.main". If this isn't provided, the
+                        DJANGO_SETTINGS_MODULE environment variable will be
+                        used.
+  --pythonpath PYTHONPATH
+                        A directory to add to the Python path, e.g.
+                        "/home/djangoprojects/myproject".
+  --traceback           Raise on CommandError exceptions
+  --no-color            Don't colorize the command output.
+
 (django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data 2
 Refresh data started.
 Refreshing data for PoliticalPlace: 2 - Brisbane QLD, Australia
 Refresh data completed successfully  for 1 items, 0 errors.
+
 (django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data 2 3 4
 Refresh data started.
 Refreshing data for PoliticalPlace: 2 - Brisbane QLD, Australia
 Refreshing data for PoliticalPlace: 3 - Via Luigi Gastinelli, 118, 00132 Roma RM, Italy
 Refreshing data for PoliticalPlace: 4 - US-3, United States
 Refresh data completed successfully for 3 items, 0 errors.
+
 (django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data 2 3 4 -v 0
 Refresh data started.
 Refresh data completed successfully for 3 items, 0 errors.
+
 (django-political-map) 20tab:django-political-map gabbo$ python manage.py refresh_data
 Refresh data started.
 Refreshing data for PoliticalPlace: 2 - Brisbane QLD, Australia
