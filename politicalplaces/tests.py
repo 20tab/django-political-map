@@ -6,7 +6,7 @@ from .utils import country_to_continent
 from .backends import Client
 from .exceptions import NoResultsException  # GeoTypeException
 from .widgets import PlaceWidget
-#from .forms import PoliticalPlaceForm
+# from .forms import PoliticalPlaceForm
 from googlemaps.exceptions import HTTPError
 
 import json
@@ -23,7 +23,7 @@ class PlaceWidgetTest(TestCase):
             str(self.placewidget.media),
             """<link href="/static/politicalplaces/css/politicalplaces.css" type="text/css" media="all" rel="stylesheet" />
 <script type="text/javascript" src="/static/politicalplaces/js/politicalplaces.js"></script>
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?language=en&amp;key=AIzaSyBUSalEfGXgegMLzcZGSx45YT01okoRfOs"></script>"""
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?language=en&amp;key=AIzaSyBUSalEfGXgegMLzcZGSx45YT01okoRfOs"></script>"""  # noqa
         )
 
     def test_place_widget_render(self):
@@ -374,7 +374,7 @@ class MapItemModelTest(TestCase):
 
     def test_get_or_create_from_address_wrong_geo_type(self):
         address = "Lazio, Italy"
-        #with self.assertRaises(GeoTypeException):
+        # with self.assertRaises(GeoTypeException):
         #    MapItem.update_or_create_from_address(
         #        address, 'country')
         map_item = MapItem.update_or_create_from_address(
@@ -450,6 +450,7 @@ class MapItemModelTest(TestCase):
             'ChIJHdCfu0S2k3ERqeJexcrMbfM')
 
     def test_geometry_properties(self):
+        # maxDiff = None
         address = "Thailandia"
         map_item = MapItem.update_or_create_from_address(
             address, 'country')
@@ -470,11 +471,11 @@ class MapItemModelTest(TestCase):
             })
         self.assertEqual(
             map_item.geometry_viewport(False), {
-                'northeast': {'lat': 20.4643551, 'lng': 105.6353682},
-                'southwest': {'lat': 5.6135541, 'lng': 97.3449049}
+                'northeast': {'lat': 20.465143, 'lng': 105.636812},
+                'southwest': {'lat': 5.613038, 'lng': 97.343396}
             })
         self.assertEqual(
             json.loads(map_item.geometry_viewport()), {
-                'northeast': {'lat': 20.4643551, 'lng': 105.6353682},
-                'southwest': {'lat': 5.6135541, 'lng': 97.3449049}
+                'northeast': {'lat': 20.465143, 'lng': 105.636812},
+                'southwest': {'lat': 5.613038, 'lng': 97.343396}
             })
