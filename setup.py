@@ -5,9 +5,8 @@ setup(
     name='django-political-map',
     version=politicalplaces.__version__,
     description='Django application to store geolocalized places and organize them according to political hierarchy.',
-    author='20tab S.r.l.',
+    author='Gabriel Giaccari, 20tab S.r.l.',
     author_email='info@20tab.com',
-    #url='https://gitlab.20tab.com/20tab/django-political-map',
     url='https://github.com/20tab/django-political-map.git',
     license='MIT License',
     install_requires=[

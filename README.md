@@ -14,9 +14,12 @@ Features:
 
 Installation
 ------------
-This package is under development end needs live testing.
-If you want to try it in your project, you can install the
-git version:
+This package looks stable but it needs more live testing.
+If you want to try it in your project, you can pip install it:
+
+  - ```pip install django-political-map```
+
+  or via git:
 
   - ```pip install git+https://github.com/20tab/django-political-map.git```
   
