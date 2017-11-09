@@ -17,3 +17,5 @@ coverage/
 .coverage
 clonedigger_output.html
 node_modules/
+dist/
+django_political_map.egg-info/
