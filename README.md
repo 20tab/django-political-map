@@ -6,6 +6,9 @@ Django Political Map
 Django application to store geolocalized places and organize them
 according to political hierarchy.
 
+Note: this project doesn't require GeoDjango or Gis fields, you should save
+geographical data in your own model in order to perform gis queries.
+
 Features:
 - store your geographic data in a single model
 - provide address and process it to automatically fill all geo informations

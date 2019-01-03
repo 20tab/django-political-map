@@ -32,14 +32,14 @@ class MyLocationInlineTest(MyLocation):
 
 
 class MyLocationInlinePlace(models.Model):
-    parent_location = models.ForeignKey(MyLocation)
+    parent_location = models.ForeignKey(MyLocation, on_delete=models.CASCADE)
     place = PlaceField(
         on_delete=models.SET_NULL,
         null=True, blank=True)
 
 
 class MyLocationInlineNotPlace(models.Model):
-    parent_location = models.ForeignKey(MyLocation)
+    parent_location = models.ForeignKey(MyLocation, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=True)
 
 

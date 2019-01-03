@@ -1,3 +1,3 @@
-VERSION = (1, 0)
+VERSION = (1, 1)
 __version__ = '.'.join(map(str, VERSION))
-DATE = "2017-11-09"
+DATE = "2019-01-03"
