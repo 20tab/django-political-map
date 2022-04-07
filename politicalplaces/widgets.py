@@ -6,7 +6,7 @@ from django.conf import settings
 
 class PlaceWidget(TextInput):
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         template = 'place_field/place_widget.html'
 
         text_input = super(PlaceWidget, self).render(
