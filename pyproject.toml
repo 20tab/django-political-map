@@ -1,3 +1,15 @@
+[tool.black]
+target-version = ["py38"]
+
+[tool.isort]
+atomic = true
+profile = "black"
+combine_as_imports = true
+default_section = "THIRDPARTY"
+known_first_party = [
+    "politicalplaces",
+]
+
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
