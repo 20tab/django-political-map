@@ -1,9 +1,11 @@
-from setuptools import setup, find_packages
-import politicalplaces
+from setuptools import find_packages, setup
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
 setup(
     name='django-political-map',
-    version=politicalplaces.__version__,
+    version="1.2.0",
     description='Django application to store geolocalized places and organize them according to political hierarchy.',
     author='Gabriel Giaccari, 20tab S.r.l.',
     author_email='info@20tab.com',
