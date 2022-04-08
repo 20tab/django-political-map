@@ -20,3 +20,4 @@ node_modules/
 dist/
 django_political_map.egg-info/
 .venv/
+*.bak
